@@ -1,0 +1,50 @@
+# Gradle - Ignore build artifacts but keep Gradle wrapper
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IntelliJ IDEA - Ignore IDE configuration files
+.idea/
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse - Ignore Eclipse-specific files
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# NetBeans - Ignore NetBeans-specific files
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code - Ignore VS Code settings
+.vscode/
+
+# macOS - Ignore system files
+.DS_Store
+
+# Logs - Ignore log files
+*.log
+logs/
+log/
+
+# System and temporary files
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo

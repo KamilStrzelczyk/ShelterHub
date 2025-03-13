@@ -11,6 +11,5 @@ public class WelcomeScreen {
     Label welcomeLabel = new Label(WELCOME_MESSAGE);
     welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
     root.getChildren().add(welcomeLabel); // Dodanie tekstu do środka
-    root.getChildren().add(welcomeLabel); // Dodanie tekstu do środka
   }
 }

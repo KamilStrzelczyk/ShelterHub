@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 public class WelcomeScreen {
+
   private static final String WELCOME_MESSAGE = "Witamy w systemie ShelterHub!";
 
   public static void show(StackPane root) {

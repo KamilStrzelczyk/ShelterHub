@@ -1,5 +1,5 @@
 # ShelterHub
-ShelterHub is a desktop application written in Java, using JavaFX for the user interface and SQLite as the database.
+ShelterHub is a desktop application written in Java, using JavaFX for the user interface and MSSQL as the database.
 
 ### Static Code Analysis
 

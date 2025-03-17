@@ -1,4 +1,4 @@
-name: Main
+name: Pull request check
 on:
   push:
     branches:
@@ -33,13 +33,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
-      - name: Download key.properties
-        uses: actions/download-artifact@v4
-        with:
-          name: key-properties
-          path: ${{ github.workspace }}/composeApp/
-
-      - name: Checkstyle
+      - name: Run Checkstyle
         uses: gradle/gradle-build-action@v3
         with:
           arguments: checkstyle

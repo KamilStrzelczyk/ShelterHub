@@ -17,93 +17,128 @@ import org.emp.shelterhub.feature.about.AboutScreen;
 public class WelcomeScreen {
     private static final String WELCOME_MESSAGE = "Witaj w systemie ShelterHub!";
     private static final String SUBTITLE_MESSAGE = "System zarządzania Schroniskiem Górskim Wilcza Turnia";
+    private static final String PRIMARY_BUTTON_COLOR = "#2196F3";
+    private static final String HOVER_BUTTON_COLOR = "#1976D2";
 
     public static void show(StackPane root) {
-        // Main container with white background and shadow
-        VBox loginContainer = new VBox(20);
-        loginContainer.setStyle("-fx-background-color: white; -fx-background-radius: 15;");
-        loginContainer.setPadding(new Insets(40));
-        loginContainer.setMaxWidth(700);
-        loginContainer.setAlignment(Pos.CENTER);
+        VBox loginContainer = createContainer();
 
-        // Add shadow effect
+        VBox header = createHeader();
+        VBox userInput = createUserInputSection();
+        Button submitButton = createLoginButton();
+
+        configureLoginAction(submitButton, root, userInput);
+
+        loginContainer.getChildren().addAll(header, userInput, submitButton);
+
+        root.setStyle("-fx-background-color: #f5f5f5;");
+        root.getChildren().add(loginContainer);
+        StackPane.setAlignment(loginContainer, Pos.CENTER);
+    }
+
+    private static VBox createContainer() {
+        VBox container = new VBox(25);
+        container.setStyle("-fx-background-color: white; -fx-background-radius: 15;");
+        container.setPadding(new Insets(40));
+        container.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        container.setMaxWidth(600);
+        container.setMaxHeight(500);
+        container.setAlignment(Pos.CENTER);
+
         DropShadow shadow = new DropShadow();
         shadow.setColor(Color.rgb(0, 0, 0, 0.2));
         shadow.setRadius(20);
-        loginContainer.setEffect(shadow);
+        container.setEffect(shadow);
 
-        // Welcome messages
+        return container;
+    }
+
+    private static VBox createHeader() {
+        VBox header = new VBox(10);
+        header.setAlignment(Pos.CENTER);
+
         Label welcomeLabel = new Label(WELCOME_MESSAGE);
-        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2196F3;");
+        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: " + PRIMARY_BUTTON_COLOR + ";");
 
         Label subtitleLabel = new Label(SUBTITLE_MESSAGE);
         subtitleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #757575; -fx-font-weight: normal;");
 
-        // Input fields container
-        VBox inputFields = new VBox(15);
-        inputFields.setAlignment(Pos.CENTER);
-        inputFields.setPadding(new Insets(30, 0, 30, 0));
-        inputFields.setMaxWidth(350);
+        header.getChildren().addAll(welcomeLabel, subtitleLabel);
+        return header;
+    }
 
-        // Username field
-        VBox usernameBox = new VBox(5);
-        Label usernameLabel = new Label("Nazwa użytkownika");
-        usernameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #424242;");
-        TextField usernameField = new TextField();
-        usernameField.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 5; " +
-                              "-fx-border-color: #e0e0e0; -fx-border-radius: 5; " +
-                              "-fx-padding: 10; -fx-font-size: 14px;");
-        usernameField.setPromptText("Wprowadź nazwę użytkownika");
-        usernameBox.getChildren().addAll(usernameLabel, usernameField);
+    private static VBox createUserInputSection() {
+        VBox inputSection = new VBox(20);
+        inputSection.setAlignment(Pos.CENTER);
+        inputSection.setPadding(new Insets(25, 0, 25, 0));
+        inputSection.setMaxWidth(450);
 
-        // Password field
-        VBox passwordBox = new VBox(5);
-        Label passwordLabel = new Label("Hasło");
-        passwordLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #424242;");
-        PasswordField passwordField = new PasswordField();
-        passwordField.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 5; " +
-                             "-fx-border-color: #e0e0e0; -fx-border-radius: 5; " +
-                             "-fx-padding: 10; -fx-font-size: 14px;");
-        passwordField.setPromptText("Wprowadź hasło");
-        passwordBox.getChildren().addAll(passwordLabel, passwordField);
+        VBox usernameField = createInputField("Nazwa użytkownika", "Wprowadź nazwę użytkownika", false);
+        VBox passwordField = createInputField("Hasło", "Wprowadź hasło", true);
 
-        // Login button
-        Button submitButton = new Button("Zaloguj się");
-        submitButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; " +
-                            "-fx-font-size: 14px; -fx-font-weight: bold; " +
-                            "-fx-padding: 12 30; -fx-background-radius: 5;");
-        submitButton.setMaxWidth(Double.MAX_VALUE);
-        
-        // Hover effect for button
-        submitButton.setOnMouseEntered(e -> 
-            submitButton.setStyle("-fx-background-color: #1976D2; -fx-text-fill: white; " +
-                                "-fx-font-size: 14px; -fx-font-weight: bold; " +
-                                "-fx-padding: 12 30; -fx-background-radius: 5;")
+        inputSection.getChildren().addAll(usernameField, passwordField);
+        return inputSection;
+    }
+
+    private static VBox createInputField(String labelText, String promptText, boolean isPassword) {
+        VBox fieldContainer = new VBox(5);
+        fieldContainer.setMaxWidth(Double.MAX_VALUE);
+
+        Label label = new Label(labelText);
+        label.setStyle("-fx-font-size: 14px; -fx-text-fill: #424242;");
+
+        String fieldStyle = "-fx-background-color: #f5f5f5; -fx-background-radius: 5; " +
+                "-fx-border-color: #e0e0e0; -fx-border-radius: 5; " +
+                "-fx-padding: 10; -fx-font-size: 14px;";
+
+        if (isPassword) {
+            PasswordField passwordField = new PasswordField();
+            passwordField.setStyle(fieldStyle);
+            passwordField.setPromptText(promptText);
+            passwordField.setMaxWidth(Double.MAX_VALUE);
+            fieldContainer.getChildren().addAll(label, passwordField);
+        } else {
+            TextField textField = new TextField();
+            textField.setStyle(fieldStyle);
+            textField.setPromptText(promptText);
+            textField.setMaxWidth(Double.MAX_VALUE);
+            fieldContainer.getChildren().addAll(label, textField);
+        }
+
+        return fieldContainer;
+    }
+
+    private static Button createLoginButton() {
+        Button loginButton = new Button("Zaloguj się");
+        String buttonStyle = "-fx-background-color: " + PRIMARY_BUTTON_COLOR + "; -fx-text-fill: white; " +
+                "-fx-font-size: 14px; -fx-font-weight: bold; " +
+                "-fx-padding: 12 30; -fx-background-radius: 5;";
+
+        loginButton.setStyle(buttonStyle);
+        loginButton.setPrefWidth(200);
+        loginButton.setMaxWidth(Region.USE_PREF_SIZE);
+
+        loginButton.setOnMouseEntered(e ->
+                loginButton.setStyle(buttonStyle.replace(PRIMARY_BUTTON_COLOR, HOVER_BUTTON_COLOR))
         );
-        submitButton.setOnMouseExited(e -> 
-            submitButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; " +
-                                "-fx-font-size: 14px; -fx-font-weight: bold; " +
-                                "-fx-padding: 12 30; -fx-background-radius: 5;")
+
+        loginButton.setOnMouseExited(e ->
+                loginButton.setStyle(buttonStyle)
         );
 
-        submitButton.setOnAction(e -> {
+        return loginButton;
+    }
+
+    private static void configureLoginAction(Button loginButton, StackPane root, VBox userInput) {
+        loginButton.setOnAction(e -> {
+            TextField usernameField = (TextField) ((VBox) userInput.getChildren().get(0)).getChildren().get(1);
+            PasswordField passwordField = (PasswordField) ((VBox) userInput.getChildren().get(1)).getChildren().get(1);
+
             String username = usernameField.getText();
             String password = passwordField.getText();
+
             root.getChildren().clear();
             AboutScreen.show(root, username);
         });
-
-        // Add all elements to the input fields container
-        inputFields.getChildren().addAll(usernameBox, passwordBox, submitButton);
-
-        // Add all elements to the main container
-        loginContainer.getChildren().addAll(welcomeLabel, subtitleLabel, inputFields);
-
-        // Set the background color of the root container
-        root.setStyle("-fx-background-color: #f5f5f5;");
-        
-        // Center the login container in the root
-        root.getChildren().add(loginContainer);
-        StackPane.setAlignment(loginContainer, Pos.CENTER);
     }
 }

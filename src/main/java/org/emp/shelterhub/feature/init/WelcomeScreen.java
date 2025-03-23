@@ -2,148 +2,167 @@ package org.emp.shelterhub.feature.init;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import org.emp.shelterhub.feature.about.AboutScreen;
+import org.emp.shelterhub.lib.infrastructure.utils.Res;
+
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public class WelcomeScreen {
   private static final String WELCOME_MESSAGE = "Witaj w systemie ShelterHub!";
-  private static final String SUBTITLE_MESSAGE =
-      "System zarządzania Schroniskiem Górskim Wilcza Turnia";
-  private static final String PRIMARY_BUTTON_COLOR = "#2196F3";
-  private static final String HOVER_BUTTON_COLOR = "#1976D2";
+  private static final String SUBTITLE_MESSAGE = "System zarządzania Schroniskiem Górskim Wilcza Turnia";
+  private static final String PRIMARY_BUTTON_COLOR = "#6A3A56";
+  private static final String HOVER_BUTTON_COLOR = "#5c324b";
+  private static final String LOGO_IMAGE_URL = "/images/SHELTERHUB.Logo.png";
+
+  static WelcomeScreenViewModel viewModel = new WelcomeScreenViewModel();
+  State state = new State();
 
   public static void show(StackPane root) {
-    VBox loginContainer = createContainer();
+    viewModel.setRoot(root);
 
-    VBox header = createHeader();
-    VBox userInput = createUserInputSection();
-    Button submitButton = createLoginButton();
+    UICreate ui = new UICreate();
 
-    configureLoginAction(submitButton, root, userInput);
+    VBox loginContainer = ui.createBox(25, "#F7E0D6", 15, new Insets(40), 600, 500);
+    ui.addShadow(loginContainer, 20, 0.2);
 
-    loginContainer.getChildren().addAll(header, userInput, submitButton);
+    ImageView logoImageView = ui.createLogo(LOGO_IMAGE_URL, 400, 80);
+
+    Label welcomeLabel = ui.createLabel(WELCOME_MESSAGE, 28, true, PRIMARY_BUTTON_COLOR);
+    Label subtitleLabel = ui.createLabel(SUBTITLE_MESSAGE, 16, false, PRIMARY_BUTTON_COLOR);
+    VBox header = ui.createBox(10, null, 0, null, 0, 0);
+
+    // Add logo to header before the text
+    header.getChildren().addAll(logoImageView, welcomeLabel, subtitleLabel);
+
+    TextField usernameField = ui.createTextField("Wprowadź nazwę użytkownika");
+    PasswordField passwordField = ui.createPasswordField("Wprowadź hasło");
+
+    VBox usernameContainer = ui.createFieldContainer("Nazwa użytkownika", usernameField);
+    VBox passwordContainer = ui.createFieldContainer("Hasło", passwordField);
+
+    VBox userInput = ui.createBox(20, null, 0, new Insets(25, 0, 25, 0), 450, 0);
+    userInput.getChildren().addAll(usernameContainer, passwordContainer);
+
+    Button loginButton = ui.createButton("Zaloguj się", PRIMARY_BUTTON_COLOR, HOVER_BUTTON_COLOR);
+    loginButton.setOnAction(e ->
+            viewModel.login(usernameField.getText(), passwordField.getText())
+
+    );
+
+    loginContainer.getChildren().addAll(header, userInput, loginButton);
 
     root.setStyle("-fx-background-color: #f5f5f5;");
     root.getChildren().add(loginContainer);
     StackPane.setAlignment(loginContainer, Pos.CENTER);
   }
 
-  private static VBox createContainer() {
-    VBox container = new VBox(25);
-    container.setStyle("-fx-background-color: white; -fx-background-radius: 15;");
-    container.setPadding(new Insets(40));
-    container.setPrefWidth(Region.USE_COMPUTED_SIZE);
-    container.setMaxWidth(600);
-    container.setMaxHeight(500);
-    container.setAlignment(Pos.CENTER);
+  private static class UICreate {
 
-    DropShadow shadow = new DropShadow();
-    shadow.setColor(Color.rgb(0, 0, 0, 0.2));
-    shadow.setRadius(20);
-    container.setEffect(shadow);
+    VBox createBox(int spacing, String bgColor, int radius, Insets padding,
+                   double maxWidth, double maxHeight) {
+      VBox box = new VBox(spacing);
+      box.setAlignment(Pos.CENTER);
 
-    return container;
-  }
+      if (bgColor != null) {
+        box.setStyle("-fx-background-color: " + bgColor +
+                (radius > 0 ? "; -fx-background-radius: " + radius : ""));
+      }
 
-  private static VBox createHeader() {
-    VBox header = new VBox(10);
-    header.setAlignment(Pos.CENTER);
+      if (padding != null) box.setPadding(padding);
+      if (maxWidth > 0) box.setMaxWidth(maxWidth);
+      if (maxHeight > 0) box.setMaxHeight(maxHeight);
 
-    Label welcomeLabel = new Label(WELCOME_MESSAGE);
-    welcomeLabel.setStyle(
-        "-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: " + PRIMARY_BUTTON_COLOR + ";");
-
-    Label subtitleLabel = new Label(SUBTITLE_MESSAGE);
-    subtitleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #757575; -fx-font-weight: normal;");
-
-    header.getChildren().addAll(welcomeLabel, subtitleLabel);
-    return header;
-  }
-
-  private static VBox createUserInputSection() {
-    VBox inputSection = new VBox(20);
-    inputSection.setAlignment(Pos.CENTER);
-    inputSection.setPadding(new Insets(25, 0, 25, 0));
-    inputSection.setMaxWidth(450);
-
-    VBox usernameField = createInputField("Nazwa użytkownika", "Wprowadź nazwę użytkownika", false);
-    VBox passwordField = createInputField("Hasło", "Wprowadź hasło", true);
-
-    inputSection.getChildren().addAll(usernameField, passwordField);
-    return inputSection;
-  }
-
-  private static VBox createInputField(String labelText, String promptText, boolean isPassword) {
-    VBox fieldContainer = new VBox(5);
-    fieldContainer.setMaxWidth(Double.MAX_VALUE);
-
-    Label label = new Label(labelText);
-    label.setStyle("-fx-font-size: 14px; -fx-text-fill: #424242;");
-
-    String fieldStyle =
-        "-fx-background-color: #f5f5f5; -fx-background-radius: 5; "
-            + "-fx-border-color: #e0e0e0; -fx-border-radius: 5; "
-            + "-fx-padding: 10; -fx-font-size: 14px;";
-
-    if (isPassword) {
-      PasswordField passwordField = new PasswordField();
-      passwordField.setStyle(fieldStyle);
-      passwordField.setPromptText(promptText);
-      passwordField.setMaxWidth(Double.MAX_VALUE);
-      fieldContainer.getChildren().addAll(label, passwordField);
-    } else {
-      TextField textField = new TextField();
-      textField.setStyle(fieldStyle);
-      textField.setPromptText(promptText);
-      textField.setMaxWidth(Double.MAX_VALUE);
-      fieldContainer.getChildren().addAll(label, textField);
+      return box;
     }
 
-    return fieldContainer;
+    void addShadow(VBox container, int radius, double opacity) {
+      DropShadow shadow = new DropShadow();
+      shadow.setColor(Color.rgb(0, 0, 0, opacity));
+      shadow.setRadius(radius);
+      container.setEffect(shadow);
+    }
+
+    // Method to create logo ImageView
+    ImageView createLogo(String imageUrl, int width, int height) {
+      final Image logoImage =
+              new Image(Objects.requireNonNull(Res.getResourcePath(imageUrl)));
+      final ImageView logoImageView = new ImageView(logoImage);
+      logoImageView.setFitWidth(width);
+      logoImageView.setFitHeight(height);
+      return logoImageView;
+    }
+
+    Label createLabel(String text, int size, boolean isBold, String color) {
+      Label label = new Label(text);
+      label.setStyle("-fx-font-size: " + size + "px" +
+              (isBold ? "; -fx-font-weight: bold" : "") +
+              "; -fx-text-fill: " + color + ";");
+      return label;
+    }
+
+    TextField createTextField(String promptText) {
+      TextField field = new TextField();
+      field.setPromptText(promptText);
+      field.setMaxWidth(Double.MAX_VALUE);
+      field.setStyle(getFieldStyle());
+      return field;
+    }
+
+    PasswordField createPasswordField(String promptText) {
+      PasswordField field = new PasswordField();
+      field.setPromptText(promptText);
+      field.setMaxWidth(Double.MAX_VALUE);
+      field.setStyle(getFieldStyle());
+      return field;
+    }
+
+    private String getFieldStyle() {
+      return "-fx-background-color: #f5f5f5; -fx-background-radius: 5; " +
+              "-fx-border-color: #e0e0e0; -fx-border-radius: 5; " +
+              "-fx-padding: 10; -fx-font-size: 14px;";
+    }
+
+    VBox createFieldContainer(String labelText, Control field) {
+      VBox container = new VBox(5);
+      container.setMaxWidth(Double.MAX_VALUE);
+
+      Label label = createLabel(labelText, 14, false, "#424242");
+      container.getChildren().addAll(label, field);
+
+      return container;
+    }
+
+    Button createButton(String text, String primaryColor, String hoverColor) {
+      Button button = new Button(text);
+
+      String buttonStyle = "-fx-background-color: " + primaryColor + "; " +
+              "-fx-text-fill: white; " +
+              "-fx-font-size: 14px; -fx-font-weight: bold; " +
+              "-fx-padding: 12 30; -fx-background-radius: 5;";
+
+      button.setStyle(buttonStyle);
+      button.setPrefWidth(200);
+      button.setMaxWidth(Region.USE_PREF_SIZE);
+
+      button.setOnMouseEntered(e ->
+              button.setStyle(buttonStyle.replace(primaryColor, hoverColor)));
+
+      button.setOnMouseExited(e ->
+              button.setStyle(buttonStyle));
+
+      return button;
+    }
   }
 
-  private static Button createLoginButton() {
-    Button loginButton = new Button("Zaloguj się");
-    String buttonStyle =
-        "-fx-background-color: "
-            + PRIMARY_BUTTON_COLOR
-            + "; -fx-text-fill: white; "
-            + "-fx-font-size: 14px; -fx-font-weight: bold; "
-            + "-fx-padding: 12 30; -fx-background-radius: 5;";
-
-    loginButton.setStyle(buttonStyle);
-    loginButton.setPrefWidth(200);
-    loginButton.setMaxWidth(Region.USE_PREF_SIZE);
-
-    loginButton.setOnMouseEntered(
-        e -> loginButton.setStyle(buttonStyle.replace(PRIMARY_BUTTON_COLOR, HOVER_BUTTON_COLOR)));
-
-    loginButton.setOnMouseExited(e -> loginButton.setStyle(buttonStyle));
-
-    return loginButton;
-  }
-
-  private static void configureLoginAction(Button loginButton, StackPane root, VBox userInput) {
-    loginButton.setOnAction(
-        e -> {
-          TextField usernameField =
-              (TextField) ((VBox) userInput.getChildren().get(0)).getChildren().get(1);
-          PasswordField passwordField =
-              (PasswordField) ((VBox) userInput.getChildren().get(1)).getChildren().get(1);
-
-          String username = usernameField.getText();
-          String password = passwordField.getText();
-
-          root.getChildren().clear();
-          AboutScreen.show(root, username);
-        });
+  void test(String title, Consumer<Boolean> textConsumer) {
+       textConsumer.accept(true);
   }
 }

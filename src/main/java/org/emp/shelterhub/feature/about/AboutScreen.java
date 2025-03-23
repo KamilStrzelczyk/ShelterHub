@@ -6,41 +6,43 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.emp.shelterhub.feature.init.WelcomeScreen;
 
 public class AboutScreen {
-  private static final String ABOUT_TITLE = "O aplikacji ShelterHub";
-  private static final String ABOUT_DESCRIPTION =
-      "ShelterHub to system zarządzania Schroniskiem Górskim Wilcza Turnia";
+    private static final String ABOUT_TITLE = "O aplikacji ShelterHub";
+    private static final String ABOUT_DESCRIPTION =
+            "ShelterHub to system zarządzania Schroniskiem Górskim Wilcza Turnia";
 
-  public static void show(StackPane root, String username) {
-    VBox content = new VBox(20);
-    content.setAlignment(Pos.CENTER);
-    content.setPadding(new Insets(20));
+    static AboutScreenViewModel viewModel = new AboutScreenViewModel();
+    State state = viewModel.state;
 
-    Label titleLabel = new Label(ABOUT_TITLE);
-    titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+    public static void show(StackPane root, String username) {
+        viewModel.setRoot(root);
 
-    Label descriptionLabel = new Label(ABOUT_DESCRIPTION);
-    descriptionLabel.setStyle("-fx-font-size: 16px;");
+        VBox content = new VBox(20);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(20));
 
-    // Display user data
-    Label userLabel = new Label("Zalogowany jako: " + username);
-    userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2196F3;");
+        Label titleLabel = new Label(ABOUT_TITLE);
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-    Button backButton = new Button("Powrót");
-    backButton.setOnAction(
-        e -> {
-          root.getChildren().clear();
-          WelcomeScreen.show(root);
-        });
+        Label descriptionLabel = new Label(ABOUT_DESCRIPTION);
+        descriptionLabel.setStyle("-fx-font-size: 16px;");
 
-    content.getChildren().addAll(titleLabel, descriptionLabel, userLabel, backButton);
-    root.getChildren().add(content);
-  }
+        // Display user data
+        Label userLabel = new Label("Zalogowany jako: " + username);
+        userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2196F3;");
 
-  // Overload the original method to maintain compatibility
-  public static void show(StackPane root) {
-    show(root, "Gość");
-  }
+        Button backButton = new Button("Powrót");
+        backButton.setOnAction(
+                e -> {
+                    viewModel.navigateToWelcomeScreen();
+                });
+
+        content.getChildren().addAll(titleLabel, descriptionLabel, userLabel, backButton);
+        root.getChildren().add(content);
+    }
+
+    public static void show(StackPane root) {
+        show(root, "Gość");
+    }
 }

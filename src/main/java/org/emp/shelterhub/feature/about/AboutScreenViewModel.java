@@ -11,9 +11,6 @@ public class AboutScreenViewModel {
         this.root = root;
     }
 
-    public AboutScreenViewModel() {
-    }
-
     void setRoot(StackPane root) {
         this.root = root;
     }

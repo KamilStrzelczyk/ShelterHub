@@ -28,7 +28,8 @@ public class WelcomeScreenViewModel {
     void navigateToAboutScreen() {
         if (root != null) {
             root.getChildren().clear();
-            AboutScreen.show(root, state.username);
+            AboutScreen aboutScreen = new AboutScreen();
+            aboutScreen.show(root, state.username);
         }
     }
 }

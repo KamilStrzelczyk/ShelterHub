@@ -7,6 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
 import org.emp.shelterhub.lib.infrastructure.utils.UIComponents;
 
 import java.util.Objects;
@@ -25,15 +26,15 @@ public class WelcomeScreen {
 
     UIComponents ui = new UIComponents();
 
-    VBox loginContainer = ui.createBox(AppTheme.SPACING_XLARGE, AppTheme.BACKGROUND_COLOR, 
-                                     AppTheme.BORDER_RADIUS_LARGE, new Insets(40), 600, 500);
-    ui.addShadow(loginContainer, AppTheme.SHADOW_RADIUS, AppTheme.SHADOW_OPACITY);
+    VBox loginContainer = ui.createBox(Dimensions.SPACING_XLARGE, AppTheme.BACKGROUND_COLOR,
+                                     Dimensions.BORDER_RADIUS_LARGE, new Insets(40), 600, 500);
+    ui.addShadow(loginContainer, Dimensions.SHADOW_RADIUS, Dimensions.SHADOW_OPACITY);
 
     ImageView logoImageView = ui.createLogo(LOGO_IMAGE_URL, 400, 80);
 
-    Label welcomeLabel = ui.createLabel(WELCOME_MESSAGE, AppTheme.FONT_SIZE_TITLE, true, AppTheme.PRIMARY_COLOR);
-    Label subtitleLabel = ui.createLabel(SUBTITLE_MESSAGE, AppTheme.FONT_SIZE_SUBTITLE, false, AppTheme.PRIMARY_COLOR);
-    VBox header = ui.createBox(AppTheme.SPACING_MEDIUM, null, 0, null, 0, 0);
+    Label welcomeLabel = ui.createLabel(WELCOME_MESSAGE, Dimensions.FONT_SIZE_TITLE, true, AppTheme.PRIMARY_COLOR);
+    Label subtitleLabel = ui.createLabel(SUBTITLE_MESSAGE, Dimensions.FONT_SIZE_SUBTITLE, false, AppTheme.PRIMARY_COLOR);
+    VBox header = ui.createBox(Dimensions.SPACING_MEDIUM, null, 0, null, 0, 0);
 
     // Add logo to header before the text
     header.getChildren().addAll(logoImageView, welcomeLabel, subtitleLabel);
@@ -44,7 +45,7 @@ public class WelcomeScreen {
     VBox usernameContainer = ui.createFieldContainer("Nazwa użytkownika", usernameField);
     VBox passwordContainer = ui.createFieldContainer("Hasło", passwordField);
 
-    VBox userInput = ui.createBox(AppTheme.SPACING_LARGE, null, 0, new Insets(25, 0, 25, 0), 450, 0);
+    VBox userInput = ui.createBox(Dimensions.SPACING_LARGE, null, 0, new Insets(25, 0, 25, 0), 450, 0);
     userInput.getChildren().addAll(usernameContainer, passwordContainer);
 
     Button loginButton = ui.createButton("Zaloguj się", AppTheme.PRIMARY_COLOR, AppTheme.PRIMARY_COLOR_HOVER);

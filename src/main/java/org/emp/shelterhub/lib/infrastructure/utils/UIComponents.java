@@ -70,10 +70,10 @@ public class UIComponents {
     }
 
     public VBox createFieldContainer(String labelText, Control field) {
-        VBox container = new VBox(AppTheme.SPACING_SMALL);
+        VBox container = new VBox(Dimensions.SPACING_SMALL);
         container.setMaxWidth(Double.MAX_VALUE);
 
-        Label label = createLabel(labelText, AppTheme.FONT_SIZE_BODY, false, AppTheme.TEXT_COLOR_PRIMARY);
+        Label label = createLabel(labelText, Dimensions.FONT_SIZE_BODY, false, AppTheme.TEXT_COLOR_PRIMARY);
         container.getChildren().addAll(label, field);
 
         return container;
@@ -84,7 +84,7 @@ public class UIComponents {
         String buttonStyle = AppTheme.getButtonStyle(primaryColor);
         
         button.setStyle(buttonStyle);
-        button.setPrefWidth(200);
+        button.setPrefWidth(Dimensions.BUTTON_WIDTH);
         button.setMaxWidth(Region.USE_PREF_SIZE);
 
         button.setOnMouseEntered(e ->

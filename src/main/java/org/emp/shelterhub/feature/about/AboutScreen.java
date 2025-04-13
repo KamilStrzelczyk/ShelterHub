@@ -12,10 +12,10 @@ public class AboutScreen {
     private static final String ABOUT_DESCRIPTION =
             "ShelterHub to system zarządzania Schroniskiem Górskim Wilcza Turnia";
 
-    static AboutScreenViewModel viewModel = new AboutScreenViewModel();
-    State state = viewModel.state;
+    private StackPane rootPane = new StackPane();
+    private AboutScreenViewModel viewModel = new AboutScreenViewModel(rootPane);
 
-    public static void show(StackPane root, String username) {
+    public void show(StackPane root, String username) {
         viewModel.setRoot(root);
 
         VBox content = new VBox(20);
@@ -42,7 +42,7 @@ public class AboutScreen {
         root.getChildren().add(content);
     }
 
-    public static void show(StackPane root) {
+    public void show(StackPane root) {
         show(root, "Gość");
     }
 }

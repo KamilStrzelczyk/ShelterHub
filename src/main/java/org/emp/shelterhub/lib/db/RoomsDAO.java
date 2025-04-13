@@ -1,0 +1,114 @@
+package org.emp.shelterhub.lib.db;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class RoomsDAO {
+    public static class Room {
+        public int kod_pokoj;
+        public String dostepnosc;
+        public String stan;
+        public String typ;
+        public double cena;
+
+        public Room(int kod_pokoj, String dostepnosc, String stan, String typ, double cena) {
+            this.kod_pokoj = kod_pokoj;
+            this.dostepnosc = dostepnosc;
+            this.stan = stan;
+            this.typ = typ;
+            this.cena = cena;
+        }
+
+        public Room(String dostepnosc, String stan, String typ, double cena) {
+            this(-1, dostepnosc, stan, typ, cena);
+        }
+    }
+    //wszystkie pokoje
+    public List<Room> getRooms() {
+        String query = "SELECT * FROM pokoje";
+        return executeSelectQuery(query);
+    }
+    //dostepne pokoje
+    public List<Room> getAvailableRooms() {
+        String query = "SELECT * FROM pokoje WHERE dostepnosc = 'dostepny'";
+        return executeSelectQuery(query);
+    }
+    //nowy pokoj
+    public boolean addRoom(Room room) {
+        String query = "INSERT INTO pokoje (dostepnosc, stan, typ, cena_za_noc) VALUES (?, ?, ?, ?)";
+
+        try(Connection conn = Base.connect();
+            PreparedStatement ps = conn.prepareStatement(query)){
+            ps.setString(1, room.dostepnosc);
+            ps.setString(2, room.stan);
+            ps.setString(3, room.typ);
+            ps.setDouble(4, room.cena);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e){
+            System.out.println("Błąd dodawania pokoju: "+e.getMessage());
+            return false;
+        }
+    }
+    //edycja pokoju
+    public boolean updateRoom(Room room) {
+        String sql = "UPDATE pokoje SET dostepnosc = ?, stan = ?, typ = ?, cena_za_noc = ? WHERE kod_pokoj = ?";
+
+        try (Connection conn = Base.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, room.dostepnosc);
+            ps.setString(2, room.stan);
+            ps.setString(3, room.typ);
+            ps.setDouble(4, room.cena);
+            ps.setInt(5, room.kod_pokoj);
+            ps.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Błąd aktualizacji pokoju: " + e.getMessage());
+            return false;
+        }
+    }
+    //usuwanie pokoju
+    public boolean deleteRoom(int kod_pokoj) {
+        String sql = "DELETE FROM pokoje WHERE kod_pokoj = ?";
+
+        try (Connection conn = Base.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, kod_pokoj);
+            ps.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Błąd usuwania pokoju: " + e.getMessage());
+            return false;
+        }
+    }
+    // wspolny selectik
+    private List<Room> executeSelectQuery(String query) {
+        List<Room> rooms = new ArrayList<>();
+
+        try (Connection conn = Base.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                rooms.add(new Room(
+                        rs.getInt("kod_pokoj"),
+                        rs.getString("dostepnosc"),
+                        rs.getString("stan"),
+                        rs.getString("typ"),
+                        rs.getDouble("cena_za_noc")
+                ));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Błąd SELECT: " + e.getMessage());
+        }
+
+        return rooms;
+    }
+}

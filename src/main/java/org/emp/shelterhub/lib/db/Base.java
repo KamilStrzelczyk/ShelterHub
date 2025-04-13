@@ -3,10 +3,15 @@ package org.emp.shelterhub.lib.db;
 import java.sql.*;
 
 public class Base {
-    public static void main(String[] args) {
-        String url = "jdbc:sqlite:shelterhub.db";
 
-        try (Connection conn = DriverManager.getConnection(url);
+    private static final String DB_URL = "jdbc:sqlite:shelterhub.db";
+
+    public static Connection connect() throws SQLException {
+        return DriverManager.getConnection(DB_URL);
+    }
+
+    public static void main(String[] args) {
+        try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
 
             if (conn != null) {

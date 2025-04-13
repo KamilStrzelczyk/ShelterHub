@@ -1,8 +1,9 @@
 module org.emp.shelterhub {
   requires javafx.controls;
   requires javafx.fxml;
+    requires java.sql;
 
-  opens org.emp.shelterhub.app to
+    opens org.emp.shelterhub.app to
       javafx.fxml;
 
   exports org.emp.shelterhub.app;

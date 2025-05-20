@@ -57,4 +57,14 @@ public class AppTheme {
         + color
         + ";";
   }
+
+  public static String getContainerStyle() {
+    return "-fx-background-color: #CCCCCC; " // Nowy kolor tła
+        + "-fx-padding: "
+        + Dimensions.SPACING_MEDIUM
+        + "; "
+        + "-fx-spacing: "
+        + Dimensions.SPACING_LARGE
+        + ";";
+  }
 }

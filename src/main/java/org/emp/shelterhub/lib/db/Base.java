@@ -3,25 +3,27 @@ package org.emp.shelterhub.lib.db;
 import java.sql.*;
 
 public class Base {
-    public static void main(String[] args) {
-        String url = "jdbc:sqlite:shelterhub.db";
+  public static void main(String[] args) {
+    String url = "jdbc:sqlite:shelterhub.db";
 
-        try (Connection conn = DriverManager.getConnection(url);
-             Statement stmt = conn.createStatement()) {
+    try (Connection conn = DriverManager.getConnection(url);
+        Statement stmt = conn.createStatement()) {
 
-            if (conn != null) {
-                // Włącz obsługę kluczy obcych (tylko w SQLite trzeba to robić ręcznie)
-                stmt.execute("PRAGMA foreign_keys = ON");
+      if (conn != null) {
+        // Włącz obsługę kluczy obcych (tylko w SQLite trzeba to robić ręcznie)
+        stmt.execute("PRAGMA foreign_keys = ON");
 
-                // Tabele
-                stmt.execute("""
+        // Tabele
+        stmt.execute(
+            """
                     CREATE TABLE IF NOT EXISTS stanowisko (
                         id_stanowiska INTEGER PRIMARY KEY AUTOINCREMENT,
                         nazwa TEXT CHECK (nazwa IN ('kierownik', 'pracownik obslugi'))
                     );
                 """);
 
-                stmt.execute("""
+        stmt.execute(
+            """
                     CREATE TABLE IF NOT EXISTS pracownicy (
                         id_pracownika INTEGER PRIMARY KEY AUTOINCREMENT,
                         imie1 TEXT NOT NULL,
@@ -33,7 +35,8 @@ public class Base {
                     );
                 """);
 
-                stmt.execute("""
+        stmt.execute(
+            """
                     CREATE TABLE IF NOT EXISTS zatrudnienie (
                         id_zatrudnienia INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_pracownika INTEGER NOT NULL,
@@ -46,7 +49,8 @@ public class Base {
                     );
                 """);
 
-                stmt.execute("""
+        stmt.execute(
+            """
                     CREATE TABLE IF NOT EXISTS pensja (
                         id_pensja INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_pracownika INTEGER NOT NULL,
@@ -57,7 +61,8 @@ public class Base {
                     );
                 """);
 
-                stmt.execute("""
+        stmt.execute(
+            """
                     CREATE TABLE IF NOT EXISTS goscie (
                         id_gosc INTEGER PRIMARY KEY AUTOINCREMENT,
                         imie TEXT NOT NULL,
@@ -67,7 +72,8 @@ public class Base {
                     );
                 """);
 
-                stmt.execute("""
+        stmt.execute(
+            """
                     CREATE TABLE IF NOT EXISTS pokoje (
                         kod_pokoj INTEGER PRIMARY KEY AUTOINCREMENT,
                         dostepnosc TEXT CHECK (dostepnosc IN ('dostepny', 'zajety')),
@@ -77,7 +83,8 @@ public class Base {
                     );
                 """);
 
-                stmt.execute("""
+        stmt.execute(
+            """
                     CREATE TABLE IF NOT EXISTS rezerwacja (
                         id_rezerwacji INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_gosc INTEGER NOT NULL,
@@ -92,11 +99,11 @@ public class Base {
                     );
                 """);
 
-                System.out.println("Baza danych została utworzona pomyślnie.");
-            }
+        System.out.println("Baza danych została utworzona pomyślnie.");
+      }
 
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
     }
+  }
 }

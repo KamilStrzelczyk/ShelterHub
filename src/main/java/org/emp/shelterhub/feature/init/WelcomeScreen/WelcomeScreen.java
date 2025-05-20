@@ -1,6 +1,5 @@
-package org.emp.shelterhub.feature.init;
+package org.emp.shelterhub.feature.init.WelcomeScreen;
 
-import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -70,9 +69,5 @@ public class WelcomeScreen {
 
   private static class State {
     // State information as needed
-  }
-
-  void test(String title, Consumer<Boolean> textConsumer) {
-    textConsumer.accept(true);
   }
 }

@@ -4,22 +4,26 @@ import javafx.scene.layout.StackPane;
 import org.emp.shelterhub.feature.init.WelcomeScreen.WelcomeScreen;
 
 public class AboutScreenViewModel {
-    State state = new State();
-    private StackPane root;
+  State state = new State();
+  private StackPane root;
 
-    public AboutScreenViewModel(StackPane root) {
-        this.root = root;
-    }
+  public AboutScreenViewModel(StackPane root) {
+    this.root = root;
+  }
 
 //    void setRoot(StackPane root) {
 //        this.root = root;
 //    }
 
-    void navigateToWelcomeScreen() {
-        if (root != null) {
-            root.getChildren().clear();
-            WelcomeScreen.show(root);
-        }
+  void navigateToWelcomeScreen() {
+    if (root != null) {
+      root.getChildren().clear();
+      WelcomeScreen.show(root);
     }
+  }
 }
 
+class State {
+  String name;
+  String password;
+}

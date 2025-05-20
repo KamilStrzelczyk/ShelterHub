@@ -2,6 +2,7 @@ module org.emp.shelterhub {
   requires javafx.controls;
   requires javafx.fxml;
     requires java.desktop;
+    requires java.sql;
 
     opens org.emp.shelterhub.app to
       javafx.fxml;

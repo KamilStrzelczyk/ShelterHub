@@ -13,18 +13,23 @@ public class WelcomeScreenViewModel {
         this.mainNavigator = mainNavigator;
     }
 
-    void setRoot(StackPane root) {
-        this.root = root;
-    }
+  void setRoot(StackPane root) {
+    this.root = root;
+  }
 
-    void login(String username, String password) {
-        state.username = username;
-        state.password = password;
+  void login(String username, String password) {
+    state.username = username;
+    state.password = password;
 
-        navigateToAboutScreen();
-    }
+    navigateToAboutScreen();
+  }
 
     void navigateToAboutScreen() {
         mainNavigator.navigateToMainContainer();
     }
+}
+
+class State {
+  String username = "";
+  String password = "";
 }

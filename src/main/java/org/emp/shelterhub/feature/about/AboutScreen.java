@@ -6,43 +6,57 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.BorderPane;
+import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
 
 public class AboutScreen {
-    private static final String ABOUT_TITLE = "O aplikacji ShelterHub";
-    private static final String ABOUT_DESCRIPTION =
-            "ShelterHub to system zarządzania Schroniskiem Górskim Wilcza Turnia";
+  private static final String ABOUT_TITLE = "O aplikacji ShelterHub";
+  private static final String ABOUT_DESCRIPTION =
+      "ShelterHub to system zarządzania Schroniskiem Górskim Wilcza Turnia";
 
-    private StackPane rootPane = new StackPane();
-    private AboutScreenViewModel viewModel = new AboutScreenViewModel(rootPane);
+  private StackPane rootPane = new StackPane();
+  private AboutScreenViewModel viewModel = new AboutScreenViewModel(rootPane);
 
     public void show( String username) {
 //        viewModel.setRoot(root);
 
-        VBox content = new VBox(20);
-        content.setAlignment(Pos.CENTER);
-        content.setPadding(new Insets(20));
+    // Create main layout
+    BorderPane mainLayout = new BorderPane();
+    mainLayout.setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
 
-        Label titleLabel = new Label(ABOUT_TITLE);
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+    // Create content for the center
+    VBox content = new VBox(Dimensions.SPACING_LARGE);
+    content.setAlignment(Pos.CENTER);
+    content.setPadding(new Insets(Dimensions.SPACING_LARGE));
 
-        Label descriptionLabel = new Label(ABOUT_DESCRIPTION);
-        descriptionLabel.setStyle("-fx-font-size: 16px;");
+    Label titleLabel = new Label(ABOUT_TITLE);
+    titleLabel.setStyle(AppTheme.getLabelStyle(Dimensions.FONT_SIZE_TITLE, true, AppTheme.TEXT_COLOR_PRIMARY));
 
-        // Display user data
-        Label userLabel = new Label("Zalogowany jako: " + username);
-        userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2196F3;");
+    Label descriptionLabel = new Label(ABOUT_DESCRIPTION);
+    descriptionLabel.setStyle(AppTheme.getLabelStyle(Dimensions.FONT_SIZE_BODY, false, AppTheme.TEXT_COLOR_SECONDARY));
 
-        Button backButton = new Button("Powrót");
-        backButton.setOnAction(
-                e -> {
-                    viewModel.navigateToWelcomeScreen();
-                });
+    // Display user data
+    Label userLabel = new Label("Zalogowany jako: " + username);
+    userLabel.setStyle(AppTheme.getLabelStyle(Dimensions.FONT_SIZE_SUBTITLE, true, AppTheme.PRIMARY_COLOR));
 
-        content.getChildren().addAll(titleLabel, descriptionLabel, userLabel, backButton);
-        root.getChildren().add(content);
-    }
+    Button backButton = new Button("Powrót");
+    backButton.setStyle(AppTheme.getButtonStyle(AppTheme.PRIMARY_COLOR));
+    backButton.setOnAction(
+        e -> {
+          viewModel.navigateToWelcomeScreen();
+        });
 
-    public void show(StackPane root) {
-        show(root, "Gość");
-    }
+    content.getChildren().addAll(titleLabel, descriptionLabel, userLabel, backButton);
+
+    // Set content to center of BorderPane
+    mainLayout.setCenter(content);
+
+    // Add the BorderPane to the root
+    root.getChildren().add(mainLayout);
+  }
+
+  public void show(StackPane root) {
+    show(root, "Gość");
+  }
 }

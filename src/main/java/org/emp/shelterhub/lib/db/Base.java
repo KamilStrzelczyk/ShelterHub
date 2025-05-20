@@ -1,29 +1,40 @@
 package org.emp.shelterhub.lib.db;
 
+import java.io.File;
 import java.sql.*;
 
 public class Base {
-  public static void main(String[] args) {
-    String url = "jdbc:sqlite:shelterhub.db";
 
-    try (Connection conn = DriverManager.getConnection(url);
-        Statement stmt = conn.createStatement()) {
+    private static final String DB_URL = "jdbc:sqlite:shelterhub.db";
 
-      if (conn != null) {
-        // Włącz obsługę kluczy obcych (tylko w SQLite trzeba to robić ręcznie)
-        stmt.execute("PRAGMA foreign_keys = ON");
+    public static Connection connect() throws SQLException {
+        return DriverManager.getConnection(DB_URL);
+    }
 
-        // Tabele
-        stmt.execute(
-            """
+    public Base() {
+        initializeDatabase();
+    }
+
+    private void initializeDatabase() {
+        File dbFile = new File("shelterhub.db");
+        boolean isNewDatabase = !dbFile.exists();
+
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement()) {
+
+            if (isNewDatabase) {
+                System.out.println("Tworzenie nowej bazy danych...");
+                stmt.execute("PRAGMA foreign_keys = ON");
+
+                // Tworzenie tabel
+                stmt.execute("""
                     CREATE TABLE IF NOT EXISTS stanowisko (
                         id_stanowiska INTEGER PRIMARY KEY AUTOINCREMENT,
                         nazwa TEXT CHECK (nazwa IN ('kierownik', 'pracownik obslugi'))
                     );
                 """);
 
-        stmt.execute(
-            """
+                stmt.execute("""
                     CREATE TABLE IF NOT EXISTS pracownicy (
                         id_pracownika INTEGER PRIMARY KEY AUTOINCREMENT,
                         imie1 TEXT NOT NULL,
@@ -35,8 +46,7 @@ public class Base {
                     );
                 """);
 
-        stmt.execute(
-            """
+                stmt.execute("""
                     CREATE TABLE IF NOT EXISTS zatrudnienie (
                         id_zatrudnienia INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_pracownika INTEGER NOT NULL,
@@ -49,8 +59,7 @@ public class Base {
                     );
                 """);
 
-        stmt.execute(
-            """
+                stmt.execute("""
                     CREATE TABLE IF NOT EXISTS pensja (
                         id_pensja INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_pracownika INTEGER NOT NULL,
@@ -61,8 +70,7 @@ public class Base {
                     );
                 """);
 
-        stmt.execute(
-            """
+                stmt.execute("""
                     CREATE TABLE IF NOT EXISTS goscie (
                         id_gosc INTEGER PRIMARY KEY AUTOINCREMENT,
                         imie TEXT NOT NULL,
@@ -72,8 +80,7 @@ public class Base {
                     );
                 """);
 
-        stmt.execute(
-            """
+                stmt.execute("""
                     CREATE TABLE IF NOT EXISTS pokoje (
                         kod_pokoj INTEGER PRIMARY KEY AUTOINCREMENT,
                         dostepnosc TEXT CHECK (dostepnosc IN ('dostepny', 'zajety')),
@@ -83,8 +90,7 @@ public class Base {
                     );
                 """);
 
-        stmt.execute(
-            """
+                stmt.execute("""
                     CREATE TABLE IF NOT EXISTS rezerwacja (
                         id_rezerwacji INTEGER PRIMARY KEY AUTOINCREMENT,
                         id_gosc INTEGER NOT NULL,
@@ -99,11 +105,13 @@ public class Base {
                     );
                 """);
 
-        System.out.println("Baza danych została utworzona pomyślnie.");
-      }
+                System.out.println("Baza danych została utworzona pomyślnie.");
+            } else {
+                System.out.println("Używanie istniejącej bazy danych.");
+            }
 
-    } catch (SQLException e) {
-      System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("Błąd podczas inicjalizacji bazy danych: " + e.getMessage());
+        }
     }
-  }
 }

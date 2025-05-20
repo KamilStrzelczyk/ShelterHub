@@ -17,9 +17,4 @@ module org.emp.shelterhub {
 
   opens org.emp.shelterhub.feature.init to
       javafx.fxml;
-
-  exports org.emp.shelterhub.feature.init.WelcomeScreen;
-
-  opens org.emp.shelterhub.feature.init.WelcomeScreen to
-      javafx.fxml;
 }

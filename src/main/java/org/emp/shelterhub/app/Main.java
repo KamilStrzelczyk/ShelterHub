@@ -8,12 +8,15 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.emp.shelterhub.feature.init.SplashScreen;
 import org.emp.shelterhub.feature.init.WelcomeScreen.WelcomeScreen;
+import org.emp.shelterhub.lib.db.Base;
 
 public class Main extends Application {
   private static final String MAIN_TITLE = "ShelterHub";
 
   @Override
   public void start(Stage primaryStage) {
+
+    new Base();
     SplashScreen.show(() -> mainContainer(primaryStage));
   }
 

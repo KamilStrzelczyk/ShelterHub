@@ -1,5 +1,6 @@
 package org.emp.shelterhub.lib.db;
 
+import java.io.File;
 import java.sql.*;
 
 public class Base {
@@ -10,15 +11,22 @@ public class Base {
         return DriverManager.getConnection(DB_URL);
     }
 
-    public static void main(String[] args) {
+    public Base() {
+        initializeDatabase();
+    }
+
+    private void initializeDatabase() {
+        File dbFile = new File("shelterhub.db");
+        boolean isNewDatabase = !dbFile.exists();
+
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
 
-            if (conn != null) {
-                // Włącz obsługę kluczy obcych (tylko w SQLite trzeba to robić ręcznie)
+            if (isNewDatabase) {
+                System.out.println("Tworzenie nowej bazy danych...");
                 stmt.execute("PRAGMA foreign_keys = ON");
 
-                // Tabele
+                // Tworzenie tabel
                 stmt.execute("""
                     CREATE TABLE IF NOT EXISTS stanowisko (
                         id_stanowiska INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,10 +106,12 @@ public class Base {
                 """);
 
                 System.out.println("Baza danych została utworzona pomyślnie.");
+            } else {
+                System.out.println("Używanie istniejącej bazy danych.");
             }
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Błąd podczas inicjalizacji bazy danych: " + e.getMessage());
         }
     }
 }

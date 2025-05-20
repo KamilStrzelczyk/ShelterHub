@@ -1,7 +1,7 @@
 package org.emp.shelterhub.feature.about;
 
 import javafx.scene.layout.StackPane;
-import org.emp.shelterhub.feature.init.WelcomeScreen;
+import org.emp.shelterhub.feature.init.WelcomeScreen.WelcomeScreen;
 
 public class AboutScreenViewModel {
     State state = new State();
@@ -11,9 +11,9 @@ public class AboutScreenViewModel {
         this.root = root;
     }
 
-    void setRoot(StackPane root) {
-        this.root = root;
-    }
+//    void setRoot(StackPane root) {
+//        this.root = root;
+//    }
 
     void navigateToWelcomeScreen() {
         if (root != null) {
@@ -23,7 +23,3 @@ public class AboutScreenViewModel {
     }
 }
 
-class State {
-    String name;
-    String password;
-}

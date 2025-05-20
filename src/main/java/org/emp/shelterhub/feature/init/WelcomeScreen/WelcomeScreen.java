@@ -1,4 +1,4 @@
-package org.emp.shelterhub.feature.init;
+package org.emp.shelterhub.feature.init.WelcomeScreen;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,7 +10,6 @@ import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
 import org.emp.shelterhub.lib.infrastructure.utils.UIComponents;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class WelcomeScreen {

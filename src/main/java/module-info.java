@@ -1,8 +1,9 @@
 module org.emp.shelterhub {
   requires javafx.controls;
   requires javafx.fxml;
+    requires java.desktop;
 
-  opens org.emp.shelterhub.app to
+    opens org.emp.shelterhub.app to
       javafx.fxml;
 
   exports org.emp.shelterhub.app;
@@ -15,4 +16,6 @@ module org.emp.shelterhub {
 
   opens org.emp.shelterhub.feature.init to
       javafx.fxml;
+    exports org.emp.shelterhub.feature.init.WelcomeScreen;
+    opens org.emp.shelterhub.feature.init.WelcomeScreen to javafx.fxml;
 }

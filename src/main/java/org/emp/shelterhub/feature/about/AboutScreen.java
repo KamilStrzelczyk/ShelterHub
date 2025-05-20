@@ -15,8 +15,8 @@ public class AboutScreen {
     private StackPane rootPane = new StackPane();
     private AboutScreenViewModel viewModel = new AboutScreenViewModel(rootPane);
 
-    public void show(StackPane root, String username) {
-        viewModel.setRoot(root);
+    public void show( String username) {
+//        viewModel.setRoot(root);
 
         VBox content = new VBox(20);
         content.setAlignment(Pos.CENTER);

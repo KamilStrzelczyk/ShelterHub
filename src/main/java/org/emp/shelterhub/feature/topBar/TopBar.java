@@ -66,15 +66,21 @@ public class TopBar extends BorderPane {
   private void styleComponents() {
     setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
 
-    String logoutButtonStyle = 
-        "-fx-background-color: " + AppTheme.PRIMARY_COLOR + "; " +
-        "-fx-text-fill: white; " +
-        "-fx-font-size: " + Dimensions.FONT_SIZE_SUBTITLE + "px; " +
-        "-fx-font-weight: bold; " +
-        "-fx-padding: 12 30; " +
-        "-fx-background-radius: " + Dimensions.BORDER_RADIUS_XLARGE + "px; " +
-        "-fx-min-width: 100px;";
-    
+    String logoutButtonStyle =
+        "-fx-background-color: "
+            + AppTheme.PRIMARY_COLOR
+            + "; "
+            + "-fx-text-fill: white; "
+            + "-fx-font-size: "
+            + Dimensions.FONT_SIZE_SUBTITLE
+            + "px; "
+            + "-fx-font-weight: bold; "
+            + "-fx-padding: 12 30; "
+            + "-fx-background-radius: "
+            + Dimensions.BORDER_RADIUS_XLARGE
+            + "px; "
+            + "-fx-min-width: 100px;";
+
     logoutButton.setStyle(logoutButtonStyle);
   }
 }

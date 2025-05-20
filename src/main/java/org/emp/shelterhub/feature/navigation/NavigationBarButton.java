@@ -1,21 +1,20 @@
 package org.emp.shelterhub.feature.navigation;
 
 public enum NavigationBarButton {
+  ROOM("Pokoje"),
+  EMPLOYEE("Pracownicy"),
+  SCHEDULER("Grafik"),
+  REPORT("Raport"),
+  SETTINGS("Ustawienia"),
+  HELP("Pomoc"),
+  ABOUT("Informacje");
+  private final String name;
 
-    ROOM("Pokoje"),
-    EMPLOYEE("Pracownicy"),
-    SCHEDULER("Grafik"),
-    REPORT("Raport"),
-    SETTINGS("Ustawienia"),
-    HELP("Pomoc");
+  NavigationBarButton(String name) {
+    this.name = name;
+  }
 
-    private final String name;
-
-    NavigationBarButton(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 }

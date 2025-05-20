@@ -15,32 +15,32 @@ import org.emp.shelterhub.feature.settings.SettingsScreen;
 
 public class MainContainer {
 
-    private final BorderPane layout = new BorderPane();
-    private final StackPane screenContainer = new StackPane();
+  private final BorderPane layout = new BorderPane();
+  private final StackPane screenContainer = new StackPane();
 
-    public MainContainer(StackPane root) {
-        NavigationBar navigator = new NavigationBar();
-        navigator.start(layout, this::showScreen);
-        layout.setCenter(screenContainer);
-        root.getChildren().add(layout);
-    }
+  public MainContainer(StackPane root) {
+    NavigationBar navigator = new NavigationBar();
+    navigator.start(layout, this::showScreen);
+    layout.setCenter(screenContainer);
+    root.getChildren().add(layout);
 
+    showScreen(NavigationBarButton.ABOUT);
+  }
 
-    public void showScreen(NavigationBarButton screen) {
-        Node view = switch (screen) {
-            case ROOM -> new RoomScreen();
-            case EMPLOYEE -> new EmployeeScreen();
-            case SCHEDULER -> new SchedulerScreen();
-            case REPORT -> new ReportScreen();
-            case SETTINGS -> new SettingsScreen();
-            case HELP -> new HelpScreen();
-            else  {
-                    AboutScreen aboutScreen = new AboutScreen();
-                    aboutScreen.show( "");
-                }
-            }
+  public void showScreen(NavigationBarButton screen) {
+    Node view =
+        switch (screen) {
+          case ROOM -> new RoomScreen();
+          case EMPLOYEE -> new EmployeeScreen();
+          case SCHEDULER -> new SchedulerScreen();
+          case REPORT -> new ReportScreen();
+          case SETTINGS -> new SettingsScreen();
+          case HELP -> new HelpScreen();
+          case ABOUT -> {
+            AboutScreen aboutScreen = new AboutScreen();
+            yield aboutScreen.show("Test");
+          }
         };
-        screenContainer.getChildren().setAll(view);
-    }
+    screenContainer.getChildren().setAll(view);
+  }
 }
-

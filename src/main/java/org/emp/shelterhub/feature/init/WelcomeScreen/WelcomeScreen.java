@@ -1,6 +1,5 @@
 package org.emp.shelterhub.feature.init.WelcomeScreen;
 
-import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -10,8 +9,6 @@ import javafx.scene.layout.VBox;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
 import org.emp.shelterhub.lib.infrastructure.utils.UIComponents;
-
-import java.util.function.Consumer;
 
 public class WelcomeScreen {
   private static final String WELCOME_MESSAGE = "Witaj w systemie ShelterHub!";
@@ -72,9 +69,5 @@ public class WelcomeScreen {
 
   private static class State {
     // State information as needed
-  }
-
-  void test(String title, Consumer<Boolean> textConsumer) {
-    textConsumer.accept(true);
   }
 }

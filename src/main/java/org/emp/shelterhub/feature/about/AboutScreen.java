@@ -4,13 +4,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.BorderPane;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
 
-public class AboutScreen {
+public class AboutScreen extends Pane {
   private static final String ABOUT_TITLE = "O aplikacji ShelterHub";
   private static final String ABOUT_DESCRIPTION =
       "ShelterHub to system zarządzania Schroniskiem Górskim Wilcza Turnia";
@@ -18,8 +19,8 @@ public class AboutScreen {
   private StackPane rootPane = new StackPane();
   private AboutScreenViewModel viewModel = new AboutScreenViewModel(rootPane);
 
-    public void show( String username) {
-//        viewModel.setRoot(root);
+  public StackPane show(String username) {
+    viewModel.setRoot(rootPane);
 
     // Create main layout
     BorderPane mainLayout = new BorderPane();
@@ -31,14 +32,17 @@ public class AboutScreen {
     content.setPadding(new Insets(Dimensions.SPACING_LARGE));
 
     Label titleLabel = new Label(ABOUT_TITLE);
-    titleLabel.setStyle(AppTheme.getLabelStyle(Dimensions.FONT_SIZE_TITLE, true, AppTheme.TEXT_COLOR_PRIMARY));
+    titleLabel.setStyle(
+        AppTheme.getLabelStyle(Dimensions.FONT_SIZE_TITLE, true, AppTheme.TEXT_COLOR_PRIMARY));
 
     Label descriptionLabel = new Label(ABOUT_DESCRIPTION);
-    descriptionLabel.setStyle(AppTheme.getLabelStyle(Dimensions.FONT_SIZE_BODY, false, AppTheme.TEXT_COLOR_SECONDARY));
+    descriptionLabel.setStyle(
+        AppTheme.getLabelStyle(Dimensions.FONT_SIZE_BODY, false, AppTheme.TEXT_COLOR_SECONDARY));
 
     // Display user data
     Label userLabel = new Label("Zalogowany jako: " + username);
-    userLabel.setStyle(AppTheme.getLabelStyle(Dimensions.FONT_SIZE_SUBTITLE, true, AppTheme.PRIMARY_COLOR));
+    userLabel.setStyle(
+        AppTheme.getLabelStyle(Dimensions.FONT_SIZE_SUBTITLE, true, AppTheme.PRIMARY_COLOR));
 
     Button backButton = new Button("Powrót");
     backButton.setStyle(AppTheme.getButtonStyle(AppTheme.PRIMARY_COLOR));
@@ -53,10 +57,8 @@ public class AboutScreen {
     mainLayout.setCenter(content);
 
     // Add the BorderPane to the root
-    root.getChildren().add(mainLayout);
-  }
+    rootPane.getChildren().add(mainLayout);
 
-  public void show(StackPane root) {
-    show(root, "Gość");
+    return rootPane;
   }
 }

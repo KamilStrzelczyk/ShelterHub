@@ -1,17 +1,12 @@
 package org.emp.shelterhub.feature.init.WelcomeScreen;
 
 import javafx.scene.layout.StackPane;
-import org.emp.shelterhub.feature.about.AboutScreen;
+import org.emp.shelterhub.feature.MainContainer;
 import org.emp.shelterhub.feature.navigation.MainNavigator;
 
 public class WelcomeScreenViewModel {
-    MainNavigator mainNavigator;
-    State state = new State();
-    private StackPane root;
-
-    public WelcomeScreenViewModel(MainNavigator mainNavigator) {
-        this.mainNavigator = mainNavigator;
-    }
+  State state = new State();
+  private StackPane root;
 
   void setRoot(StackPane root) {
     this.root = root;
@@ -21,12 +16,18 @@ public class WelcomeScreenViewModel {
     state.username = username;
     state.password = password;
 
+    if (root != null) {
+      root.getChildren().clear();
+    }
     navigateToAboutScreen();
   }
 
-    void navigateToAboutScreen() {
-        mainNavigator.navigateToMainContainer();
-    }
+  void navigateToAboutScreen() {
+    MainContainer mainContainer = new MainContainer(root);
+    MainNavigator navigator = MainNavigator.getInstance();
+    navigator.setMainContainer(mainContainer);
+    navigator.navigateToMainContainer();
+  }
 }
 
 class State {

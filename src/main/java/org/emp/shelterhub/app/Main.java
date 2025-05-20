@@ -6,11 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.emp.shelterhub.feature.MainContainer;
 import org.emp.shelterhub.feature.init.SplashScreen;
 import org.emp.shelterhub.feature.init.WelcomeScreen.WelcomeScreen;
-import org.emp.shelterhub.feature.navigation.MainNavigator;
-import org.emp.shelterhub.feature.navigation.NavigationBarButton;
 
 public class Main extends Application {
   private static final String MAIN_TITLE = "ShelterHub";
@@ -29,14 +26,7 @@ public class Main extends Application {
     primaryStage.setScene(scene);
     primaryStage.show();
 
-
-    MainContainer mainContainer = new MainContainer(root);
-    MainNavigator navigator = MainNavigator.getInstance();
-    navigator.setMainContainer(mainContainer);
-
-    navigator.navigateToWelcomeScreen();
-//    MainContainer mainContainer = new MainContainer(root);
-//    mainContainer.showScreen(NavigationBarButton.HELP);
+    WelcomeScreen.show(root);
   }
 
   private Scene createFullScreenScene(StackPane root) {

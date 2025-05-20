@@ -7,7 +7,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.emp.shelterhub.feature.init.SplashScreen;
-import org.emp.shelterhub.feature.init.WelcomeScreen;
+import org.emp.shelterhub.feature.init.WelcomeScreen.WelcomeScreen;
 
 public class Main extends Application {
   private static final String MAIN_TITLE = "ShelterHub";

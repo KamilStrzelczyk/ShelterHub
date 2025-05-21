@@ -6,11 +6,11 @@ import java.util.List;
 
 public class EmployeesDAO {
 
-  public static class Employee {
+  private static class Employee {
     public int id_pracownika;
     public String imie1, imie2, nazwisko, data_ur, adres, telefon;
 
-    public Employee(
+    private Employee(
         int id_pracownika,
         String imie1,
         String imie2,
@@ -33,7 +33,6 @@ public class EmployeesDAO {
     }
   }
 
-  // wyswietlenie wszystkich pracownikow
   public List<Employee> getAllEmployees() {
     List<Employee> list = new ArrayList<>();
     String query = "SELECT * FROM pracownicy";
@@ -61,7 +60,6 @@ public class EmployeesDAO {
     return list;
   }
 
-  // dodanie nowego pracownika
   public boolean addEmployee(Employee emp) {
     String sql =
         "INSERT INTO pracownicy (imie1, imie2, nazwisko, data_ur, adres, telefon) VALUES (?, ?, ?, ?, ?, ?)";
@@ -84,7 +82,6 @@ public class EmployeesDAO {
     }
   }
 
-  // aktualizacja danych pracownika
   public boolean updateEmployee(Employee emp) {
     String sql =
         "UPDATE pracownicy SET imie1 = ?, imie2 = ?, nazwisko = ?, data_ur = ?, adres = ?, telefon = ? WHERE id_pracownika = ?";
@@ -108,7 +105,6 @@ public class EmployeesDAO {
     }
   }
 
-  // usuwanie pracownika
   public boolean deleteEmployee(int id_pracownika) {
     String sql = "DELETE FROM pracownicy WHERE id_pracownika = ?";
 

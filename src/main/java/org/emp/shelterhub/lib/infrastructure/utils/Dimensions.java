@@ -6,7 +6,7 @@ public class Dimensions {
   public static final int FONT_SIZE_TITLE = 28;
   public static final int FONT_SIZE_SUBTITLE = 18;
   public static final int FONT_SIZE_BODY = 16;
-
+  public static final int FONT_SIZE_TITLE_LARGE = 24;
   // Spacing and padding
   public static final int SPACING_SMALL = 5;
   public static final int SPACING_MEDIUM = 10;

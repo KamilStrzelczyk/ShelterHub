@@ -25,8 +25,12 @@ spotless {
     }
 }
 
-tasks.named("spotlessApply") {
-    mustRunAfter("checkstyleMain")
+tasks.register("fixAndCheck") {
+    group = "verification"
+    description = "Uruchamia checkstyle, spotlessCheck, a na końcu poprawia kod przez spotlessApply"
+
+    dependsOn("checkstyleMain", "checkstyleTest", "spotlessCheck")
+    finalizedBy("spotlessApply")
 }
 
 tasks.withType<Checkstyle>().configureEach {

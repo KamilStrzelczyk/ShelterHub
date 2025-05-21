@@ -1,8 +1,6 @@
 package org.emp.shelterhub.lib.infrastructure.utils;
 
-/** Central class for managing application theme properties including colors and fonts. */
 public class AppTheme {
-  // Color scheme
   public static final String PRIMARY_COLOR = "#6A3A56";
   public static final String PRIMARY_COLOR_HOVER = "#5c324b";
   public static final String BACKGROUND_COLOR = "#F7E0D6";
@@ -10,8 +8,12 @@ public class AppTheme {
   public static final String BORDER_COLOR = "#e0e0e0";
   public static final String TEXT_COLOR_PRIMARY = "#424242";
   public static final String TEXT_COLOR_SECONDARY = "#757575";
+  public static final String ERROR_COLOR = "#FF0000"; // Czerwony
+  public static final String SUCCESS_COLOR = "#00FF00"; // Zielony
+  public static final String CARD_BACKGROUND_COLOR = "#FFFFFF"; // Biały
+  public static final String SECONDARY_COLOR = "#3A6A56"; // Przykładowy kolor
+  public static final String TEXT_COLOR_LIGHT = "#FFFFFF"; // Biały
 
-  // Common style strings
   public static String getButtonStyle(String bgColor) {
     return "-fx-background-color: "
         + bgColor
@@ -59,7 +61,7 @@ public class AppTheme {
   }
 
   public static String getContainerStyle() {
-    return "-fx-background-color: #CCCCCC; " // Nowy kolor tła
+    return "-fx-background-color: #CCCCCC; "
         + "-fx-padding: "
         + Dimensions.SPACING_MEDIUM
         + "; "

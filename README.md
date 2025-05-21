@@ -3,14 +3,14 @@ ShelterHub is a desktop application written in Java, using JavaFX for the user i
 
 ### Static Code Analysis
 
-Static Code Analysis
-The application uses Spotless and Checkstyle, which help analyze and enforce coding standards for the codebase.
-These tools ensure that the code remains clean and adheres to best practices.
+The application uses **Spotless** and **Checkstyle** to analyze and enforce coding standards.
+These tools ensure the code remains clean, consistent, and aligned with best practices.
 
-The analysis is automatically performed during the CI/CD process.
-To run Spotless and Checkstyle manually, use the following Gradle commands:
+Code analysis and formatting are automatically performed during the CI/CD process.
 
-```
-./gradlew spotlessApply
-./gradlew checkstyleMain
-```
+#### 🔧 Run locally
+
+To manually check and auto-format the code, use the following command:
+
+```bash
+./gradlew fixAndCheck

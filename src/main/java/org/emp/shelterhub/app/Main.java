@@ -27,6 +27,7 @@ public class Main extends Application {
     Scene scene = createFullScreenScene(root);
 
     primaryStage.setScene(scene);
+    primaryStage.setMaximized(true);
     primaryStage.show();
 
     WelcomeScreen.show(root);

@@ -3,10 +3,12 @@ package org.emp.shelterhub.feature.init;
 import java.util.Objects;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -30,6 +32,11 @@ public class SplashScreen {
           final StackPane root = new StackPane(splashImageView);
           final Scene splashScene = new Scene(root, 300, 500);
           splashStage.setScene(splashScene);
+
+          Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+          splashStage.setX(screenBounds.getMinX() + (screenBounds.getWidth() - 300) / 2);
+          splashStage.setY(screenBounds.getMinY() + (screenBounds.getHeight() - 500) / 2);
+
           splashStage.show();
 
           final PauseTransition delay = new PauseTransition(Duration.seconds(3));

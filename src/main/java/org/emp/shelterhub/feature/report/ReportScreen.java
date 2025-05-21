@@ -1,17 +1,39 @@
 package org.emp.shelterhub.feature.report;
 
-import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
+import static org.emp.shelterhub.lib.infrastructure.utils.Dimensions.FONT_SIZE_TITLE_LARGE;
 
-public class ReportScreen extends Pane {
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+
+public class ReportScreen extends StackPane {
+
+  private final ReportScreenViewModel viewModel = new ReportScreenViewModel();
 
   public ReportScreen() {
-    Label label = new Label("Report");
-    label.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
-    double centerX = this.getWidth() / 2 - label.getWidth() / 2;
-    double centerY = this.getHeight() / 2 - label.getHeight() / 2;
-    label.setLayoutX(centerX);
-    label.setLayoutY(centerY);
-    this.getChildren().add(label);
+    this.setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
+    this.setAlignment(Pos.CENTER);
+
+    Label label = new Label("Raport o stanie zajętości pokoi");
+    label.setFont(new Font(FONT_SIZE_TITLE_LARGE));
+    label.setStyle("-fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
+
+    Button generateReportButton = new Button("Generuj Raport");
+    generateReportButton.setStyle(AppTheme.getButtonStyle(AppTheme.PRIMARY_COLOR));
+    generateReportButton.setOnAction(
+        e -> {
+          viewModel.generateOccupancyReport();
+          System.out.println("Przycisk 'Generuj Raport' został naciśnięty na ekranie raportu.");
+        });
+
+    VBox contentBox = new VBox(20);
+    contentBox.setAlignment(Pos.CENTER);
+    contentBox.getChildren().addAll(label, generateReportButton);
+
+    this.getChildren().add(contentBox);
   }
 }

@@ -4,7 +4,7 @@ module org.emp.shelterhub {
   requires java.desktop;
   requires java.sql;
 
-    opens org.emp.shelterhub.app to
+  opens org.emp.shelterhub.app to
       javafx.fxml;
 
   exports org.emp.shelterhub.app;

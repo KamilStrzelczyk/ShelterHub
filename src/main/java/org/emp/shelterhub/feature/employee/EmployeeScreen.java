@@ -2,7 +2,9 @@ package org.emp.shelterhub.feature.employee;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -14,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import org.emp.shelterhub.feature.employee.data.Employee;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+import java.util.Optional;
 
 public class EmployeeScreen extends VBox {
   private static final int COLUMNS = 2;
@@ -122,16 +125,6 @@ public class EmployeeScreen extends VBox {
             + AppTheme.BORDER_COLOR
             + ";"
             + "-fx-border-radius: 5; -fx-background-radius: 5;");
-    container.setOnMouseClicked(
-        e -> {
-          EmployeeEditDialog dialog = new EmployeeEditDialog(employee);
-          dialog.setOnSave(
-              updatedEmployee -> {
-                viewModel.updateEmployee(updatedEmployee);
-                refreshEmployeeList();
-              });
-          dialog.showAndWait();
-        });
 
     Label nameLabel =
         new Label(
@@ -155,10 +148,70 @@ public class EmployeeScreen extends VBox {
     phoneLabel.setStyle(
         "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_SECONDARY + ";");
 
+    // Create buttons for edit and delete
+    Button editButton = new Button("Edytuj");
+    editButton.setStyle(
+        "-fx-background-color: "
+            + AppTheme.PRIMARY_COLOR
+            + "; -fx-text-fill: "
+            + AppTheme.TEXT_COLOR_LIGHT
+            + "; -fx-font-size: 12px; -fx-padding: 5 10; -fx-background-radius: 3;");
+    editButton.setOnAction(
+        e -> {
+          EmployeeEditDialog dialog = new EmployeeEditDialog(employee);
+          dialog.setOnSave(
+              updatedEmployee -> {
+                viewModel.updateEmployee(updatedEmployee);
+                refreshEmployeeList();
+              });
+          dialog.showAndWait();
+        });
+
+    Button deleteButton = new Button("Usuń");
+    deleteButton.setStyle(
+        "-fx-background-color: "
+            + "#d9534f"  // Red color for delete button
+            + "; -fx-text-fill: "
+            + AppTheme.TEXT_COLOR_LIGHT
+            + "; -fx-font-size: 12px; -fx-padding: 5 10; -fx-background-radius: 3;");
+    deleteButton.setOnAction(
+        e -> {
+          // Show confirmation dialog
+          Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+          confirmDialog.setTitle("Potwierdź usunięcie");
+          confirmDialog.setHeaderText("Czy na pewno chcesz usunąć pracownika?");
+          confirmDialog.setContentText(
+              "Pracownik: " + employee.getFirstName() + " " + employee.getLastName() + 
+              " zostanie trwale usunięty z bazy danych.");
+
+          // Process the result
+          Optional<ButtonType> result = confirmDialog.showAndWait();
+          if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean success = viewModel.deleteEmployee(employee);
+            if (success) {
+              refreshEmployeeList();
+            } else {
+              // Show error dialog if deletion failed
+              Alert errorDialog = new Alert(Alert.AlertType.ERROR);
+              errorDialog.setTitle("Błąd usuwania");
+              errorDialog.setHeaderText("Nie udało się usunąć pracownika");
+              errorDialog.setContentText(
+                  "Wystąpił błąd podczas usuwania pracownika z bazy danych.");
+              errorDialog.showAndWait();
+            }
+          }
+        });
+
+    // Create button container
+    HBox buttonBox = new HBox(5, editButton, deleteButton);
+    buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+    // Add all elements to the container
     container.add(nameLabel, 0, 0);
     container.add(dobLabel, 0, 1);
     container.add(addressLabel, 0, 2);
     container.add(phoneLabel, 0, 3);
+    container.add(buttonBox, 0, 4);
 
     return container;
   }

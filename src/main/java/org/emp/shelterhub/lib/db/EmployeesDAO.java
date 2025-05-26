@@ -6,7 +6,7 @@ import java.util.List;
 
 public class EmployeesDAO {
 
-  private static class Employee {
+  public static class Employee {
     public int id_pracownika;
     public String imie1, imie2, nazwisko, data_ur, adres, telefon;
 

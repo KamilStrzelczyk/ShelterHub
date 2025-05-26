@@ -148,7 +148,6 @@ public class EmployeeScreen extends VBox {
     phoneLabel.setStyle(
         "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_SECONDARY + ";");
 
-    // Create buttons for edit and delete
     Button editButton = new Button("Edytuj");
     editButton.setStyle(
         "-fx-background-color: "
@@ -170,13 +169,13 @@ public class EmployeeScreen extends VBox {
     Button deleteButton = new Button("Usuń");
     deleteButton.setStyle(
         "-fx-background-color: "
-            + "#d9534f"  // Red color for delete button
+            + "#d9534f"
             + "; -fx-text-fill: "
             + AppTheme.TEXT_COLOR_LIGHT
             + "; -fx-font-size: 12px; -fx-padding: 5 10; -fx-background-radius: 3;");
     deleteButton.setOnAction(
         e -> {
-          // Show confirmation dialog
+
           Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
           confirmDialog.setTitle("Potwierdź usunięcie");
           confirmDialog.setHeaderText("Czy na pewno chcesz usunąć pracownika?");
@@ -184,14 +183,13 @@ public class EmployeeScreen extends VBox {
               "Pracownik: " + employee.getFirstName() + " " + employee.getLastName() + 
               " zostanie trwale usunięty z bazy danych.");
 
-          // Process the result
+
           Optional<ButtonType> result = confirmDialog.showAndWait();
           if (result.isPresent() && result.get() == ButtonType.OK) {
             boolean success = viewModel.deleteEmployee(employee);
             if (success) {
               refreshEmployeeList();
             } else {
-              // Show error dialog if deletion failed
               Alert errorDialog = new Alert(Alert.AlertType.ERROR);
               errorDialog.setTitle("Błąd usuwania");
               errorDialog.setHeaderText("Nie udało się usunąć pracownika");
@@ -202,11 +200,9 @@ public class EmployeeScreen extends VBox {
           }
         });
 
-    // Create button container
     HBox buttonBox = new HBox(5, editButton, deleteButton);
     buttonBox.setAlignment(Pos.CENTER_RIGHT);
 
-    // Add all elements to the container
     container.add(nameLabel, 0, 0);
     container.add(dobLabel, 0, 1);
     container.add(addressLabel, 0, 2);

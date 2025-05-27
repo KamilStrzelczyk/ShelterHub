@@ -55,6 +55,7 @@ javafx {
 
 dependencies {
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

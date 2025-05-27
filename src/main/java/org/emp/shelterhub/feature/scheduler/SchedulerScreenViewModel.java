@@ -25,11 +25,11 @@ public class SchedulerScreenViewModel {
   }
 
   public List<Employee> getEmployees() {
-    return employeeViewModel.getEmployees();
+    return new ArrayList<>();
   }
 
   private void generateDummySchedule() {
-    List<Employee> employees = employeeViewModel.getEmployees();
+    List<Employee> employees = new ArrayList<>();
     if (employees.isEmpty()) {
       System.out.println("Brak dostępnych przykładowych pracowników do harmonogramowania.");
       return;

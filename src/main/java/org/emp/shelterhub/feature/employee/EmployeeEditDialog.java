@@ -1,5 +1,6 @@
 package org.emp.shelterhub.feature.employee;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,17 +20,23 @@ import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 public class EmployeeEditDialog extends Stage {
 
   private Employee employee;
-  private TextField firstNameField;
-  private TextField middleNameField;
-  private TextField lastNameField;
-  private TextField dateOfBirthField;
-  private TextField addressField;
-  private TextField phoneNumberField;
+  private final EmployeeScreenViewModel viewModel;
+
+  private final TextField firstNameField;
+  private final TextField middleNameField;
+  private final TextField lastNameField;
+  private final TextField dateOfBirthField;
+  private final TextField addressField;
+  private final TextField phoneNumberField;
+
+  private final Label errorMessageLabel;
 
   private Consumer<Employee> onSaveConsumer;
 
-  public EmployeeEditDialog(Employee employee) {
+  public EmployeeEditDialog(EmployeeScreenViewModel viewModel, Employee employee) {
+    this.viewModel = viewModel;
     this.employee = employee;
+
     initModality(Modality.APPLICATION_MODAL);
     setTitle(
         employee == null
@@ -44,6 +51,10 @@ public class EmployeeEditDialog extends Stage {
     Label titleLabel =
         new Label(employee == null ? "Dodaj Nowego Pracownika" : "Edytuj Pracownika");
     titleLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
+
+    errorMessageLabel = new Label("");
+    errorMessageLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
+    errorMessageLabel.setVisible(false);
 
     firstNameField = createTextField("Imię:", employee != null ? employee.getFirstName() : "");
     middleNameField =
@@ -95,9 +106,10 @@ public class EmployeeEditDialog extends Stage {
     Region spacer = new Region();
     VBox.setVgrow(spacer, Priority.ALWAYS);
 
-    root.getChildren().addAll(titleLabel, fieldsWrapper, spacer, buttonBox);
+    root.getChildren().addAll(titleLabel, errorMessageLabel, fieldsWrapper, spacer, buttonBox);
 
     Scene scene = new Scene(root, 350, 500);
+    setScene(scene);
   }
 
   private TextField createTextField(String labelText, String initialValue) {
@@ -108,6 +120,12 @@ public class EmployeeEditDialog extends Stage {
   }
 
   private void handleSave() {
+    resetFieldStyles();
+
+    if (!validateInput()) {
+      return;
+    }
+
     if (employee != null) {
       employee.setFirstName(firstNameField.getText());
       employee.setMiddleName(middleNameField.getText());
@@ -131,6 +149,57 @@ public class EmployeeEditDialog extends Stage {
       onSaveConsumer.accept(employee);
     }
     close();
+  }
+
+  private boolean validateInput() {
+    errorMessageLabel.setVisible(false);
+
+    String firstName = firstNameField.getText();
+    String lastName = lastNameField.getText();
+    String phoneNumber = phoneNumberField.getText();
+    String dateOfBirth = dateOfBirthField.getText();
+    int currentEmployeeId = employee != null ? employee.getEmployeeId() : 0;
+
+    Map<String, String> errors =
+        viewModel.validate(firstName, lastName, phoneNumber, dateOfBirth, currentEmployeeId);
+
+    if (!errors.isEmpty()) {
+      for (Map.Entry<String, String> error : errors.entrySet()) {
+        switch (error.getKey()) {
+          case "firstName":
+            showError(error.getValue(), firstNameField);
+            break;
+          case "lastName":
+            showError(error.getValue(), lastNameField);
+            break;
+          case "phoneNumber":
+            showError(error.getValue(), phoneNumberField);
+            break;
+          case "dateOfBirth":
+            showError(error.getValue(), dateOfBirthField);
+            break;
+        }
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  private void showError(String message, TextField field) {
+    errorMessageLabel.setText(message);
+    errorMessageLabel.setVisible(true);
+    field.setStyle(field.getStyle() + "; -fx-border-color: red;");
+  }
+
+  private void resetFieldStyles() {
+    errorMessageLabel.setVisible(false);
+    firstNameField.setStyle(AppTheme.getTextFieldStyle());
+    middleNameField.setStyle(AppTheme.getTextFieldStyle());
+    lastNameField.setStyle(AppTheme.getTextFieldStyle());
+    dateOfBirthField.setStyle(AppTheme.getTextFieldStyle());
+    addressField.setStyle(AppTheme.getTextFieldStyle());
+    phoneNumberField.setStyle(AppTheme.getTextFieldStyle());
   }
 
   public void setOnSave(Consumer<Employee> onSaveConsumer) {

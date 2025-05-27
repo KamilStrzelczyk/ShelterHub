@@ -1,8 +1,9 @@
-package org.emp.shelterhub.lib.db;
+package org.emp.shelterhub.lib.db.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.emp.shelterhub.lib.db.database.SHDataBase;
 
 public class RoomsDAO {
   public static class Room {
@@ -38,7 +39,7 @@ public class RoomsDAO {
   public boolean addRoom(Room room) {
     String query = "INSERT INTO pokoje (dostepnosc, stan, typ, cena_za_noc) VALUES (?, ?, ?, ?)";
 
-    try (Connection conn = Base.connect();
+    try (Connection conn = SHDataBase.connect();
         PreparedStatement ps = conn.prepareStatement(query)) {
       ps.setString(1, room.dostepnosc);
       ps.setString(2, room.stan);
@@ -56,7 +57,7 @@ public class RoomsDAO {
     String sql =
         "UPDATE pokoje SET dostepnosc = ?, stan = ?, typ = ?, cena_za_noc = ? WHERE kod_pokoj = ?";
 
-    try (Connection conn = Base.connect();
+    try (Connection conn = SHDataBase.connect();
         PreparedStatement ps = conn.prepareStatement(sql)) {
 
       ps.setString(1, room.dostepnosc);
@@ -76,7 +77,7 @@ public class RoomsDAO {
   public boolean deleteRoom(int kod_pokoj) {
     String sql = "DELETE FROM pokoje WHERE kod_pokoj = ?";
 
-    try (Connection conn = Base.connect();
+    try (Connection conn = SHDataBase.connect();
         PreparedStatement ps = conn.prepareStatement(sql)) {
 
       ps.setInt(1, kod_pokoj);
@@ -92,7 +93,7 @@ public class RoomsDAO {
   private List<Room> executeSelectQuery(String query) {
     List<Room> rooms = new ArrayList<>();
 
-    try (Connection conn = Base.connect();
+    try (Connection conn = SHDataBase.connect();
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery(query)) {
 

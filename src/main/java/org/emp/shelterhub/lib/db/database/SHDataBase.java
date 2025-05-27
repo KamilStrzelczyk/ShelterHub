@@ -1,9 +1,9 @@
-package org.emp.shelterhub.lib.db;
+package org.emp.shelterhub.lib.db.database;
 
 import java.io.File;
 import java.sql.*;
 
-public class Base {
+public class SHDataBase {
 
   private static final String DB_URL = "jdbc:sqlite:shelterhub.db";
 
@@ -11,7 +11,7 @@ public class Base {
     return DriverManager.getConnection(DB_URL);
   }
 
-  public Base() {
+  public SHDataBase() {
     initializeDatabase();
   }
 
@@ -26,7 +26,6 @@ public class Base {
         System.out.println("Tworzenie nowej bazy danych...");
         stmt.execute("PRAGMA foreign_keys = ON");
 
-        // Tworzenie tabel
         stmt.execute(
             """
                     CREATE TABLE IF NOT EXISTS stanowisko (

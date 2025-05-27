@@ -1,6 +1,6 @@
 package org.emp.shelterhub.feature.help;
 
-import java.awt.Desktop; // For opening mail client
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -88,8 +88,7 @@ public class SHDataBase {
             """
                     CREATE TABLE IF NOT EXISTS pokoje (
                         kod_pokoj INTEGER PRIMARY KEY AUTOINCREMENT,
-                        dostepnosc TEXT CHECK (dostepnosc IN ('dostepny', 'zajety')),
-                        stan TEXT CHECK (stan IN ('brudny', 'czysty')),
+                        stan TEXT CHECK (stan IN ('czysty', 'brudny', 'zajety', 'awaria')),
                         typ TEXT CHECK (typ IN ('1-osobowy', '2-osobowy', '3-osobowy')),
                         cena_za_noc REAL
                     );

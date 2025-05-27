@@ -1,90 +1,96 @@
 package org.emp.shelterhub.feature.room;
 
 import java.util.function.Consumer;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region; // Import Region for spacer
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.emp.shelterhub.feature.room.data.Room;
+import org.emp.shelterhub.feature.room.data.RoomState;
+import org.emp.shelterhub.feature.room.data.RoomType;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 
 public class RoomEditDialog extends Stage {
 
   private Room room;
-  private CheckBox isOccupiedCheckBox;
-  private CheckBox isCleanCheckBox;
-  private CheckBox isAvailableCheckBox;
-  private CheckBox hasMalfunctionCheckBox;
+  private final TextField roomNumberField;
+  private final ComboBox<RoomType> roomTypeComboBox;
+  private final ComboBox<RoomState> roomStateComboBox;
+  private final Label errorMessageLabel;
 
   private Consumer<Room> onSaveConsumer;
 
   public RoomEditDialog(Room room) {
     this.room = room;
+
     initModality(Modality.APPLICATION_MODAL);
-    setTitle("Edytuj Pokój " + room.getRoomNumber());
+    setTitle(room == null ? "Dodaj Nowy Pokój" : "Edytuj Pokój " + room.getRoomNumber());
 
     VBox root = new VBox(15);
     root.setPadding(new Insets(20));
     root.setAlignment(Pos.TOP_CENTER);
     root.setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
 
-    Label titleLabel = new Label("Edytuj status pokoju " + room.getRoomNumber());
+    Label titleLabel =
+        new Label(room == null ? "Dodaj Nowy Pokój" : "Edytuj Pokój " + room.getRoomNumber());
     titleLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
 
-    VBox checkboxContent = new VBox(10);
-    checkboxContent.setAlignment(Pos.CENTER_LEFT);
-    isOccupiedCheckBox = new CheckBox("Zajęty");
-    isOccupiedCheckBox.setSelected(room.isOccupied());
-    isOccupiedCheckBox.setStyle(
-        "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
+    errorMessageLabel = new Label("");
+    errorMessageLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
+    errorMessageLabel.setVisible(false);
 
-    isCleanCheckBox = new CheckBox("Czysty");
-    isCleanCheckBox.setSelected(room.isClean());
-    isCleanCheckBox.setStyle(
-        "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
+    roomNumberField = new TextField();
+    roomNumberField.setPromptText("Numer pokoju");
+    roomNumberField.setStyle("-fx-font-size: 14px;");
+    if (room != null) {
+      roomNumberField.setText(String.valueOf(room.getRoomNumber()));
+      roomNumberField.setDisable(true); // nie można zmieniać numeru przy edycji
+    }
 
-    isAvailableCheckBox = new CheckBox("Dostępny");
-    isAvailableCheckBox.setSelected(room.isAvailable());
-    isAvailableCheckBox.setStyle(
-        "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
+    roomTypeComboBox = new ComboBox<>(FXCollections.observableArrayList(RoomType.values()));
+    roomTypeComboBox.setStyle("-fx-font-size: 14px;");
+    roomTypeComboBox.setPromptText("Typ pokoju");
+    if (room != null) {
+      roomTypeComboBox.setValue(room.getRoomType());
+    }
 
-    hasMalfunctionCheckBox = new CheckBox("Awaria");
-    hasMalfunctionCheckBox.setSelected(room.hasMalfunction());
-    hasMalfunctionCheckBox.setStyle(
-        "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
+    roomStateComboBox = new ComboBox<>(FXCollections.observableArrayList(RoomState.values()));
+    roomStateComboBox.setStyle("-fx-font-size: 14px;");
+    roomStateComboBox.setPromptText("Stan pokoju");
+    if (room != null) {
+      roomStateComboBox.setValue(room.getRoomState());
+    }
 
-    checkboxContent
+    VBox fieldsContainer = new VBox(10);
+    fieldsContainer.setAlignment(Pos.CENTER_LEFT);
+    if (room == null) {
+      fieldsContainer.getChildren().addAll(new Label("Numer pokoju:"), roomNumberField);
+    }
+    fieldsContainer
         .getChildren()
-        .addAll(isOccupiedCheckBox, isCleanCheckBox, isAvailableCheckBox, hasMalfunctionCheckBox);
-
-    HBox checkboxContainerWrapper = new HBox(checkboxContent);
-    checkboxContainerWrapper.setAlignment(Pos.CENTER);
-
-    HBox buttonBox = getHBox();
-
-    Region spacerAfterTitle = new Region();
-    VBox.setVgrow(spacerAfterTitle, Priority.ALWAYS);
-
-    Region spacerBeforeButtons = new Region();
-    VBox.setVgrow(spacerBeforeButtons, Priority.ALWAYS);
-
-    root.getChildren()
         .addAll(
-            titleLabel, spacerAfterTitle, checkboxContainerWrapper, spacerBeforeButtons, buttonBox);
+            new Label("Typ pokoju:"),
+            roomTypeComboBox,
+            new Label("Stan pokoju:"),
+            roomStateComboBox);
 
-    Scene scene = new Scene(root, 300, 350);
+    HBox buttonBox = createButtonBox();
+
+    Region spacer = new Region();
+    VBox.setVgrow(spacer, Priority.ALWAYS);
+
+    root.getChildren().addAll(titleLabel, errorMessageLabel, fieldsContainer, spacer, buttonBox);
+
+    Scene scene = new Scene(root);
     setScene(scene);
+    sizeToScene();
   }
 
-  private HBox getHBox() {
+  private HBox createButtonBox() {
     Button saveButton = new Button("Zapisz");
     saveButton.setStyle(
         "-fx-background-color: "
@@ -109,15 +115,63 @@ public class RoomEditDialog extends Stage {
   }
 
   private void handleSave() {
-    room.setOccupied(isOccupiedCheckBox.isSelected());
-    room.setClean(isCleanCheckBox.isSelected());
-    room.setAvailable(isAvailableCheckBox.isSelected());
-    room.setMalfunction(hasMalfunctionCheckBox.isSelected());
+    resetFieldStyles();
+
+    if (!validateInput()) {
+      return;
+    }
+
+    if (room == null) {
+      int roomNumber = Integer.parseInt(roomNumberField.getText().trim());
+      room = new Room(roomNumber, roomTypeComboBox.getValue());
+    }
+
+    room.setRoomType(roomTypeComboBox.getValue());
+    room.setRoomState(roomStateComboBox.getValue());
 
     if (onSaveConsumer != null) {
       onSaveConsumer.accept(room);
     }
     close();
+  }
+
+  private boolean validateInput() {
+    errorMessageLabel.setVisible(false);
+
+    if (room == null) {
+      String input = roomNumberField.getText().trim();
+      if (input.isEmpty()) {
+        showError("Proszę podać numer pokoju.");
+        return false;
+      }
+      try {
+        Integer.parseInt(input);
+      } catch (NumberFormatException e) {
+        showError("Numer pokoju musi być liczbą całkowitą.");
+        return false;
+      }
+    }
+
+    if (roomTypeComboBox.getValue() == null) {
+      showError("Proszę wybrać typ pokoju.");
+      return false;
+    }
+
+    if (roomStateComboBox.getValue() == null) {
+      showError("Proszę wybrać stan pokoju.");
+      return false;
+    }
+
+    return true;
+  }
+
+  private void showError(String message) {
+    errorMessageLabel.setText(message);
+    errorMessageLabel.setVisible(true);
+  }
+
+  private void resetFieldStyles() {
+    errorMessageLabel.setVisible(false);
   }
 
   public void setOnSave(Consumer<Room> onSaveConsumer) {

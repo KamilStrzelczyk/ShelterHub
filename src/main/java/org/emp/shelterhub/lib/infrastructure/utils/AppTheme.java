@@ -8,6 +8,7 @@ public class AppTheme {
   public static final String BORDER_COLOR = "#e0e0e0";
   public static final String TEXT_COLOR_PRIMARY = "#424242";
   public static final String TEXT_COLOR_SECONDARY = "#757575";
+  public static final String WARNING_COLOR = "#FFA500"; // Pomarańczowy
   public static final String ERROR_COLOR = "#FF0000"; // Czerwony
   public static final String SUCCESS_COLOR = "#00FF00"; // Zielony
   public static final String CARD_BACKGROUND_COLOR = "#FFFFFF"; // Biały

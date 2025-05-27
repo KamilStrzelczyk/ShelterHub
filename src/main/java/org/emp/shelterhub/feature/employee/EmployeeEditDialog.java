@@ -1,8 +1,7 @@
 package org.emp.shelterhub.feature.employee;
 
-import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,25 +15,28 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.emp.shelterhub.feature.employee.data.Employee;
-import org.emp.shelterhub.feature.employee.service.EmployeeService;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 
 public class EmployeeEditDialog extends Stage {
 
   private Employee employee;
-  private TextField firstNameField;
-  private TextField middleNameField;
-  private TextField lastNameField;
-  private TextField dateOfBirthField;
-  private TextField addressField;
-  private TextField phoneNumberField;
+  private final EmployeeScreenViewModel viewModel;
 
-  private Label errorMessageLabel;
+  private final TextField firstNameField;
+  private final TextField middleNameField;
+  private final TextField lastNameField;
+  private final TextField dateOfBirthField;
+  private final TextField addressField;
+  private final TextField phoneNumberField;
+
+  private final Label errorMessageLabel;
 
   private Consumer<Employee> onSaveConsumer;
 
-  public EmployeeEditDialog(Employee employee) {
+  public EmployeeEditDialog(EmployeeScreenViewModel viewModel, Employee employee) {
+    this.viewModel = viewModel;
     this.employee = employee;
+
     initModality(Modality.APPLICATION_MODAL);
     setTitle(
         employee == null
@@ -150,53 +152,35 @@ public class EmployeeEditDialog extends Stage {
   }
 
   private boolean validateInput() {
-    if (firstNameField.getText().trim().isEmpty()) {
-      showError("Imię jest wymagane", firstNameField);
-      return false;
-    }
+    errorMessageLabel.setVisible(false);
 
-    if (lastNameField.getText().trim().isEmpty()) {
-      showError("Nazwisko jest wymagane", lastNameField);
-      return false;
-    }
+    String firstName = firstNameField.getText();
+    String lastName = lastNameField.getText();
+    String phoneNumber = phoneNumberField.getText();
+    String dateOfBirth = dateOfBirthField.getText();
+    int currentEmployeeId = employee != null ? employee.getEmployeeId() : 0;
 
-    String dateOfBirth = dateOfBirthField.getText().trim();
-    if (!dateOfBirth.isEmpty() && !isValidDateFormat(dateOfBirth)) {
-      showError("Data urodzenia musi być w formacie RRRR-MM-DD", dateOfBirthField);
-      return false;
-    }
+    Map<String, String> errors =
+        viewModel.validate(firstName, lastName, phoneNumber, dateOfBirth, currentEmployeeId);
 
-    String phoneNumber = phoneNumberField.getText().trim();
-    if (!phoneNumber.isEmpty()) {
-      if (!isPhoneNumberUnique(phoneNumber)) {
-        showError("Ten numer telefonu jest już używany przez innego pracownika", phoneNumberField);
-        return false;
+    if (!errors.isEmpty()) {
+      for (Map.Entry<String, String> error : errors.entrySet()) {
+        switch (error.getKey()) {
+          case "firstName":
+            showError(error.getValue(), firstNameField);
+            break;
+          case "lastName":
+            showError(error.getValue(), lastNameField);
+            break;
+          case "phoneNumber":
+            showError(error.getValue(), phoneNumberField);
+            break;
+          case "dateOfBirth":
+            showError(error.getValue(), dateOfBirthField);
+            break;
+        }
       }
-    }
-
-    return true;
-  }
-
-  private boolean isValidDateFormat(String date) {
-    String regex = "^\\d{4}-\\d{2}-\\d{2}$";
-    if (!Pattern.matches(regex, date)) {
       return false;
-    }
-
-
-    return true;
-  }
-
-  private boolean isPhoneNumberUnique(String phoneNumber) {
-    if (employee != null && phoneNumber.equals(employee.getPhoneNumber())) {
-      return true;
-    }
-
-    List<Employee> allEmployees = EmployeeService.getAllEmployees();
-    for (Employee emp : allEmployees) {
-      if (phoneNumber.equals(emp.getPhoneNumber())) {
-        return false;
-      }
     }
 
     return true;

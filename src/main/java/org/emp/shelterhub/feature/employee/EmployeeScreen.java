@@ -1,29 +1,25 @@
 package org.emp.shelterhub.feature.employee;
 
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import org.emp.shelterhub.feature.employee.data.Employee;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
-import java.util.Optional;
 
 public class EmployeeScreen extends VBox {
   private static final int COLUMNS = 2;
 
-  EmployeeScreenViewModel viewModel = new EmployeeScreenViewModel();
-  private GridPane employeeGrid;
-  private ScrollPane scrollPane;
+  private final EmployeeScreenViewModel viewModel = new EmployeeScreenViewModel();
+  private final GridPane employeeGrid;
+  private Disposable stateSubscription;
 
   public EmployeeScreen() {
     this.setSpacing(10);
@@ -44,12 +40,8 @@ public class EmployeeScreen extends VBox {
             + "; -fx-font-size: 14px; -fx-padding: 8 15; -fx-background-radius: 5;");
     addEmployeeButton.setOnAction(
         e -> {
-          EmployeeEditDialog dialog = new EmployeeEditDialog(null);
-          dialog.setOnSave(
-              newEmployee -> {
-                viewModel.addNewEmployee(newEmployee);
-                refreshEmployeeList();
-              });
+          EmployeeEditDialog dialog = new EmployeeEditDialog(viewModel, null);
+          dialog.setOnSave(viewModel::addNewEmployee);
           dialog.showAndWait();
         });
 
@@ -78,7 +70,7 @@ public class EmployeeScreen extends VBox {
     contentContainer.getChildren().addAll(topBar, employeeGrid);
     contentContainer.setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
 
-    scrollPane = new ScrollPane();
+    ScrollPane scrollPane = new ScrollPane();
     scrollPane.setContent(contentContainer);
     scrollPane.setFitToWidth(true);
     scrollPane.setFitToHeight(true);
@@ -88,16 +80,33 @@ public class EmployeeScreen extends VBox {
 
     this.getChildren().add(scrollPane);
     VBox.setVgrow(scrollPane, Priority.ALWAYS);
-    populateEmployeeGrid(employeeGrid);
+
+    stateSubscription =
+        viewModel
+            .getState()
+            .observeOn(Schedulers.trampoline())
+            .subscribe(
+                state ->
+                    Platform.runLater(
+                        () -> {
+                          if (state.getErrorMessage() != null) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Błąd");
+                            alert.setHeaderText("Wystąpił błąd");
+                            alert.setContentText(state.getErrorMessage());
+                            alert.showAndWait();
+                          }
+                          populateEmployeeGrid(state.getEmployees());
+                        }));
   }
 
-  private void populateEmployeeGrid(GridPane grid) {
-    grid.getChildren().clear();
+  private void populateEmployeeGrid(java.util.List<Employee> employees) {
+    employeeGrid.getChildren().clear();
     int columnIndex = 0;
     int rowIndex = 0;
-    for (Employee employee : viewModel.getEmployees()) {
+    for (Employee employee : employees) {
       GridPane employeeItem = createEmployeeItem(employee);
-      grid.add(employeeItem, columnIndex, rowIndex);
+      employeeGrid.add(employeeItem, columnIndex, rowIndex);
       GridPane.setHgrow(employeeItem, Priority.ALWAYS);
 
       columnIndex++;
@@ -106,10 +115,6 @@ public class EmployeeScreen extends VBox {
         rowIndex++;
       }
     }
-  }
-
-  private void refreshEmployeeList() {
-    populateEmployeeGrid(employeeGrid);
   }
 
   private GridPane createEmployeeItem(Employee employee) {
@@ -157,12 +162,8 @@ public class EmployeeScreen extends VBox {
             + "; -fx-font-size: 12px; -fx-padding: 5 10; -fx-background-radius: 3;");
     editButton.setOnAction(
         e -> {
-          EmployeeEditDialog dialog = new EmployeeEditDialog(employee);
-          dialog.setOnSave(
-              updatedEmployee -> {
-                viewModel.updateEmployee(updatedEmployee);
-                refreshEmployeeList();
-              });
+          EmployeeEditDialog dialog = new EmployeeEditDialog(viewModel, employee);
+          dialog.setOnSave(viewModel::updateEmployee);
           dialog.showAndWait();
         });
 
@@ -175,29 +176,9 @@ public class EmployeeScreen extends VBox {
             + "; -fx-font-size: 12px; -fx-padding: 5 10; -fx-background-radius: 3;");
     deleteButton.setOnAction(
         e -> {
-
-          Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-          confirmDialog.setTitle("Potwierdź usunięcie");
-          confirmDialog.setHeaderText("Czy na pewno chcesz usunąć pracownika?");
-          confirmDialog.setContentText(
-              "Pracownik: " + employee.getFirstName() + " " + employee.getLastName() + 
-              " zostanie trwale usunięty z bazy danych.");
-
-
-          Optional<ButtonType> result = confirmDialog.showAndWait();
-          if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean success = viewModel.deleteEmployee(employee);
-            if (success) {
-              refreshEmployeeList();
-            } else {
-              Alert errorDialog = new Alert(Alert.AlertType.ERROR);
-              errorDialog.setTitle("Błąd usuwania");
-              errorDialog.setHeaderText("Nie udało się usunąć pracownika");
-              errorDialog.setContentText(
-                  "Wystąpił błąd podczas usuwania pracownika z bazy danych.");
-              errorDialog.showAndWait();
-            }
-          }
+          EmployeeDeleteDialog deleteDialog =
+              new EmployeeDeleteDialog(employee, viewModel::deleteEmployee);
+          deleteDialog.showAndWait();
         });
 
     HBox buttonBox = new HBox(5, editButton, deleteButton);

@@ -1,49 +1,24 @@
-package org.emp.shelterhub.lib.db;
+package org.emp.shelterhub.lib.db.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.emp.shelterhub.lib.db.database.SHDataBase;
+import org.emp.shelterhub.lib.db.entity.EmployeeEntity;
 
 public class EmployeesDAO {
 
-  public static class Employee {
-    public int id_pracownika;
-    public String imie1, imie2, nazwisko, data_ur, adres, telefon;
-
-    private Employee(
-        int id_pracownika,
-        String imie1,
-        String imie2,
-        String nazwisko,
-        String data_ur,
-        String adres,
-        String telefon) {
-      this.id_pracownika = id_pracownika;
-      this.imie1 = imie1;
-      this.imie2 = imie2;
-      this.nazwisko = nazwisko;
-      this.data_ur = data_ur;
-      this.adres = adres;
-      this.telefon = telefon;
-    }
-
-    public Employee(
-        String imie1, String imie2, String nazwisko, String data_ur, String adres, String telefon) {
-      this(-1, imie1, imie2, nazwisko, data_ur, adres, telefon);
-    }
-  }
-
-  public List<Employee> getAllEmployees() {
-    List<Employee> list = new ArrayList<>();
+  public List<EmployeeEntity> getAllEmployees() {
+    List<EmployeeEntity> list = new ArrayList<>();
     String query = "SELECT * FROM pracownicy";
 
-    try (Connection conn = Base.connect();
+    try (Connection conn = SHDataBase.connect();
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery(query)) {
 
       while (rs.next()) {
         list.add(
-            new Employee(
+            new EmployeeEntity(
                 rs.getInt("id_pracownika"),
                 rs.getString("imie1"),
                 rs.getString("imie2"),
@@ -60,12 +35,12 @@ public class EmployeesDAO {
     return list;
   }
 
-  public boolean addEmployee(Employee emp) {
+  public boolean addEmployee(EmployeeEntity emp) {
     String sql =
         "INSERT INTO pracownicy (imie1, imie2, nazwisko, data_ur, adres, telefon) VALUES (?, ?, ?, ?, ?, ?)";
 
-    try (Connection conn = Base.connect();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
+    try (Connection conn = SHDataBase.connect();
+        PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
       ps.setString(1, emp.imie1);
       ps.setString(2, emp.imie2);
@@ -73,7 +48,21 @@ public class EmployeesDAO {
       ps.setString(4, emp.data_ur);
       ps.setString(5, emp.adres);
       ps.setString(6, emp.telefon);
-      ps.executeUpdate();
+
+      int affectedRows = ps.executeUpdate();
+
+      if (affectedRows == 0) {
+        throw new SQLException("Creating employee failed, no rows affected.");
+      }
+
+      try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+          emp.id_pracownika = generatedKeys.getInt(1);
+        } else {
+          throw new SQLException("Creating employee failed, no ID obtained.");
+        }
+      }
+
       return true;
 
     } catch (SQLException e) {
@@ -82,11 +71,11 @@ public class EmployeesDAO {
     }
   }
 
-  public boolean updateEmployee(Employee emp) {
+  public boolean updateEmployee(EmployeeEntity emp) {
     String sql =
         "UPDATE pracownicy SET imie1 = ?, imie2 = ?, nazwisko = ?, data_ur = ?, adres = ?, telefon = ? WHERE id_pracownika = ?";
 
-    try (Connection conn = Base.connect();
+    try (Connection conn = SHDataBase.connect();
         PreparedStatement ps = conn.prepareStatement(sql)) {
 
       ps.setString(1, emp.imie1);
@@ -108,7 +97,7 @@ public class EmployeesDAO {
   public boolean deleteEmployee(int id_pracownika) {
     String sql = "DELETE FROM pracownicy WHERE id_pracownika = ?";
 
-    try (Connection conn = Base.connect();
+    try (Connection conn = SHDataBase.connect();
         PreparedStatement ps = conn.prepareStatement(sql)) {
 
       ps.setInt(1, id_pracownika);

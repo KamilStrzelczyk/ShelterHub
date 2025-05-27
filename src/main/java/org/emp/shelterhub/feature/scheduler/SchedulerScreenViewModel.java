@@ -1,151 +1,185 @@
 package org.emp.shelterhub.feature.scheduler;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.emp.shelterhub.feature.employee.EmployeeScreenViewModel;
-import org.emp.shelterhub.feature.employee.data.Employee;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import javafx.application.Platform;
 import org.emp.shelterhub.feature.scheduler.data.ScheduleEntry;
+import org.emp.shelterhub.lib.infrastructure.repository.EmployeeRepository;
+import org.emp.shelterhub.lib.infrastructure.repository.SchedulerRepository;
 
 public class SchedulerScreenViewModel {
 
-  private List<ScheduleEntry> scheduleEntries;
-  private EmployeeScreenViewModel employeeViewModel;
+  private final BehaviorSubject<SchedulerScreenState> stateSubject =
+      BehaviorSubject.createDefault(SchedulerScreenState.initialState());
+
+  private final CompositeDisposable disposables = new CompositeDisposable();
+
+  private final SchedulerRepository schedulerRepository = new SchedulerRepository();
 
   public SchedulerScreenViewModel() {
-    this.scheduleEntries = new ArrayList<>();
-    this.employeeViewModel = new EmployeeScreenViewModel();
-    generateDummySchedule();
+    loadEmployeesFromRepository();
+    loadScheduleEntriesFromRepository();
   }
 
-  public List<ScheduleEntry> getScheduleEntries() {
-    return scheduleEntries;
+  public BehaviorSubject<SchedulerScreenState> getState() {
+    return stateSubject;
   }
 
-  public List<Employee> getEmployees() {
-    return new ArrayList<>();
+  private void loadEmployeesFromRepository() {
+    stateSubject.onNext(stateSubject.getValue().withLoading(true).withErrorMessage(null));
+
+    disposables.add(
+        Single.fromCallable(EmployeeRepository::getAllEmployees)
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                employees ->
+                    Platform.runLater(
+                        () ->
+                            stateSubject.onNext(
+                                stateSubject
+                                    .getValue()
+                                    .withEmployees(employees)
+                                    .withLoading(false)
+                                    .withErrorMessage(null))),
+                error ->
+                    Platform.runLater(
+                        () -> {
+                          error.printStackTrace();
+                          stateSubject.onNext(
+                              stateSubject
+                                  .getValue()
+                                  .withLoading(false)
+                                  .withErrorMessage(
+                                      "Błąd ładowania pracowników: " + error.getMessage()));
+                        })));
   }
 
-  private void generateDummySchedule() {
-    List<Employee> employees = new ArrayList<>();
-    if (employees.isEmpty()) {
-      System.out.println("Brak dostępnych przykładowych pracowników do harmonogramowania.");
-      return;
-    }
+  private void loadScheduleEntriesFromRepository() {
+    stateSubject.onNext(stateSubject.getValue().withLoading(true).withErrorMessage(null));
 
-    LocalDate today = LocalDate.now();
-
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch1",
-            today.with(DayOfWeek.MONDAY),
-            LocalTime.of(8, 0),
-            LocalTime.of(12, 0),
-            employees.get(0),
-            "Opieka nad zwierzętami"));
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch2",
-            today.with(DayOfWeek.MONDAY),
-            LocalTime.of(10, 0),
-            LocalTime.of(14, 0),
-            employees.get(1),
-            "Sprzątanie boksów"));
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch3",
-            today.with(DayOfWeek.TUESDAY),
-            LocalTime.of(9, 0),
-            LocalTime.of(13, 0),
-            employees.get(2),
-            "Przyjmowanie dostaw"));
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch11",
-            today.with(DayOfWeek.TUESDAY),
-            LocalTime.of(10, 15),
-            LocalTime.of(12, 45),
-            employees.get(2),
-            "Rozmowy kwalifikacyjne"));
-
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch4",
-            today.with(DayOfWeek.WEDNESDAY),
-            LocalTime.of(14, 0),
-            LocalTime.of(18, 0),
-            employees.get(0),
-            "Spacer z psami"));
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch5",
-            today.with(DayOfWeek.WEDNESDAY),
-            LocalTime.of(8, 0),
-            LocalTime.of(16, 0),
-            employees.get(3),
-            "Prace biurowe"));
-
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch6",
-            today.with(DayOfWeek.THURSDAY),
-            LocalTime.of(11, 0),
-            LocalTime.of(15, 0),
-            employees.get(1),
-            "Konserwacja sprzętu"));
-
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch7",
-            today.with(DayOfWeek.FRIDAY),
-            LocalTime.of(9, 0),
-            LocalTime.of(17, 0),
-            employees.get(4),
-            "Szkolenia"));
-
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch8",
-            today.with(DayOfWeek.SATURDAY),
-            LocalTime.of(8, 0),
-            LocalTime.of(13, 0),
-            employees.get(2),
-            "Opieka weekendowa"));
-
-    scheduleEntries.add(
-        new ScheduleEntry(
-            "sch9",
-            today.with(DayOfWeek.SUNDAY),
-            LocalTime.of(10, 0),
-            LocalTime.of(15, 0),
-            employees.get(3),
-            "Opieka weekendowa"));
+    disposables.add(
+        Single.fromCallable(schedulerRepository::getAllEntries)
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                entries ->
+                    Platform.runLater(
+                        () ->
+                            stateSubject.onNext(
+                                stateSubject
+                                    .getValue()
+                                    .withScheduleEntries(entries)
+                                    .withLoading(false)
+                                    .withErrorMessage(null))),
+                error ->
+                    Platform.runLater(
+                        () -> {
+                          error.printStackTrace();
+                          stateSubject.onNext(
+                              stateSubject
+                                  .getValue()
+                                  .withLoading(false)
+                                  .withErrorMessage(
+                                      "Błąd ładowania wpisów harmonogramu: " + error.getMessage()));
+                        })));
   }
 
   public void addScheduleEntry(ScheduleEntry entry) {
-    this.scheduleEntries.add(entry);
-    System.out.println("Dodano nowy wpis harmonogramu: " + entry.getTaskDescription());
+    stateSubject.onNext(stateSubject.getValue().withLoading(true).withErrorMessage(null));
+
+    disposables.add(
+        Single.fromCallable(() -> schedulerRepository.addEntry(entry))
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                success ->
+                    Platform.runLater(
+                        () -> {
+                          if (success) {
+                            // Po dodaniu odśwież listę wpisów
+                            loadScheduleEntriesFromRepository();
+                          } else {
+                            stateSubject.onNext(
+                                stateSubject
+                                    .getValue()
+                                    .withLoading(false)
+                                    .withErrorMessage("Nie udało się dodać wpisu."));
+                          }
+                        }),
+                error ->
+                    Platform.runLater(
+                        () -> {
+                          error.printStackTrace();
+                          stateSubject.onNext(
+                              stateSubject
+                                  .getValue()
+                                  .withLoading(false)
+                                  .withErrorMessage("Błąd dodawania wpisu: " + error.getMessage()));
+                        })));
   }
 
-  public void updateScheduleEntry(ScheduleEntry updatedEntry) {
-    scheduleEntries.stream()
-        .filter(e -> e.getId().equals(updatedEntry.getId()))
-        .findFirst()
-        .ifPresent(
-            e -> {
-              e.setDate(updatedEntry.getDate());
-              e.setStartTime(updatedEntry.getStartTime());
-              e.setEndTime(updatedEntry.getEndTime());
-              e.setAssignedEmployee(updatedEntry.getAssignedEmployee());
-              e.setTaskDescription(updatedEntry.getTaskDescription());
-              System.out.println("Zaktualizowano wpis harmonogramu: " + e.getTaskDescription());
-            });
+  public void updateScheduleEntry(ScheduleEntry updated) {
+    stateSubject.onNext(stateSubject.getValue().withLoading(true).withErrorMessage(null));
+
+    disposables.add(
+        Single.fromCallable(() -> schedulerRepository.updateEntry(updated))
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                success ->
+                    Platform.runLater(
+                        () -> {
+                          if (success) {
+                            loadScheduleEntriesFromRepository();
+                          } else {
+                            stateSubject.onNext(
+                                stateSubject
+                                    .getValue()
+                                    .withLoading(false)
+                                    .withErrorMessage("Nie udało się zaktualizować wpisu."));
+                          }
+                        }),
+                error ->
+                    Platform.runLater(
+                        () -> {
+                          error.printStackTrace();
+                          stateSubject.onNext(
+                              stateSubject
+                                  .getValue()
+                                  .withLoading(false)
+                                  .withErrorMessage(
+                                      "Błąd aktualizacji wpisu: " + error.getMessage()));
+                        })));
   }
 
-  public void deleteScheduleEntry(String entryId) {
-    scheduleEntries.removeIf(e -> e.getId().equals(entryId));
-    System.out.println("Usunięto wpis harmonogramu o ID: " + entryId);
+  public void deleteScheduleEntry(int entryId) {
+    stateSubject.onNext(stateSubject.getValue().withLoading(true).withErrorMessage(null));
+
+    disposables.add(
+        Single.fromCallable(() -> schedulerRepository.deleteEntry(String.valueOf(entryId)))
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                success ->
+                    Platform.runLater(
+                        () -> {
+                          if (success) {
+                            loadScheduleEntriesFromRepository();
+                          } else {
+                            stateSubject.onNext(
+                                stateSubject
+                                    .getValue()
+                                    .withLoading(false)
+                                    .withErrorMessage("Nie udało się usunąć wpisu."));
+                          }
+                        }),
+                error ->
+                    Platform.runLater(
+                        () -> {
+                          error.printStackTrace();
+                          stateSubject.onNext(
+                              stateSubject
+                                  .getValue()
+                                  .withLoading(false)
+                                  .withErrorMessage("Błąd usuwania wpisu: " + error.getMessage()));
+                        })));
   }
 }

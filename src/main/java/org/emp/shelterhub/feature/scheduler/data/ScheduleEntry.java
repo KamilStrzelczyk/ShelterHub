@@ -5,7 +5,7 @@ import java.time.LocalTime;
 import org.emp.shelterhub.feature.employee.data.Employee;
 
 public class ScheduleEntry {
-  private String id;
+  private int id;
   private LocalDate date;
   private LocalTime startTime;
   private LocalTime endTime;
@@ -13,7 +13,7 @@ public class ScheduleEntry {
   private String taskDescription;
 
   public ScheduleEntry(
-      String id,
+      int id,
       LocalDate date,
       LocalTime startTime,
       LocalTime endTime,
@@ -28,7 +28,7 @@ public class ScheduleEntry {
   }
 
   // Getters
-  public String getId() {
+  public int getId() {
     return id;
   }
 
@@ -52,7 +52,7 @@ public class ScheduleEntry {
     return taskDescription;
   }
 
-  public void setId(String id) {
+  public void setId(int id) {
     this.id = id;
   }
 

@@ -1,5 +1,6 @@
 package org.emp.shelterhub.feature.scheduler;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -8,7 +9,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,18 +28,21 @@ import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
 public class SchedulerScreen extends VBox {
 
   private final SchedulerScreenViewModel viewModel = new SchedulerScreenViewModel();
+  private final CompositeDisposable disposables = new CompositeDisposable();
 
   private GridPane scheduleGrid;
   private Label weekDateRangeLabel;
   private ComboBox<Employee> employeeFilterComboBox;
+  private final Label loadingLabel;
+  private final Label errorLabel;
 
   private LocalDate currentWeekStart;
   private Employee selectedEmployee;
   private Map<Employee, String> employeeColorMap;
 
   private static final int DAYS_IN_WEEK = 7;
-  private static final int START_HOUR = 8;
-  private static final int END_HOUR = 18;
+  private static final int START_HOUR = 6;
+  private static final int END_HOUR = 24;
   private static final double HOUR_SLOT_HEIGHT = 60.0;
   private static final Insets SCREEN_PADDING = new Insets(20);
   private static final double SCREEN_SPACING = 10;
@@ -55,6 +58,7 @@ public class SchedulerScreen extends VBox {
   private static final String TITLE_TEXT = "Grafik Pracowników";
   private static final String PREV_WEEK_BUTTON_TEXT = "Poprzedni Tydzień";
   private static final String NEXT_WEEK_BUTTON_TEXT = "Następny Tydzień";
+  private static final String NEW_TASK_BUTTON_TEXT = "Zaplanuj zadanie";
   private static final String EMPLOYEE_FILTER_PROMPT_TEXT = "Wybierz Pracownika";
   private static final String ALL_EMPLOYEES_TEXT = "Wszyscy Pracownicy";
   private static final String DATE_FORMAT = "dd.MM.yyyy";
@@ -71,16 +75,41 @@ public class SchedulerScreen extends VBox {
 
   public SchedulerScreen() {
     setupScreenLayout();
-    initializeEmployeeColors();
     Label title = createTitleLabel();
     HBox weekNavBar = createWeekNavBar();
     ScrollPane scrollPane = createScheduleGridAndScrollPane();
 
-    this.getChildren().addAll(title, weekNavBar, scrollPane);
+    loadingLabel = new Label("Ładowanie danych...");
+    loadingLabel.setStyle(
+        "-fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + "; -fx-font-weight: bold;");
+    loadingLabel.setVisible(false);
+
+    errorLabel = new Label();
+    errorLabel.setStyle("-fx-text-fill: " + AppTheme.ERROR_COLOR + "; -fx-font-weight: bold;");
+    errorLabel.setVisible(false);
+
+    this.getChildren().addAll(title, weekNavBar, loadingLabel, errorLabel, scrollPane);
     VBox.setVgrow(scrollPane, Priority.ALWAYS);
     this.setMaxWidth(Double.MAX_VALUE);
 
-    populateScheduleGrid();
+    disposables.add(viewModel.getState().subscribe(this::render));
+  }
+
+  private void render(SchedulerScreenState state) {
+    loadingLabel.setVisible(state.isLoading());
+
+    if (state.getErrorMessage() != null && !state.getErrorMessage().isEmpty()) {
+      errorLabel.setText(state.getErrorMessage());
+      errorLabel.setVisible(true);
+    } else {
+      errorLabel.setVisible(false);
+    }
+
+    updateEmployeeFilterComboBox(state.getEmployees());
+
+    initializeEmployeeColors(state.getEmployees());
+
+    populateScheduleGrid(state.getScheduleEntries());
   }
 
   private void setupScreenLayout() {
@@ -105,7 +134,7 @@ public class SchedulerScreen extends VBox {
     prevWeekButton.setOnAction(
         e -> {
           currentWeekStart = currentWeekStart.minusWeeks(1);
-          populateScheduleGrid();
+          populateScheduleGrid(viewModel.getState().getValue().getScheduleEntries());
         });
 
     weekDateRangeLabel = new Label();
@@ -117,28 +146,12 @@ public class SchedulerScreen extends VBox {
     nextWeekButton.setOnAction(
         e -> {
           currentWeekStart = currentWeekStart.plusWeeks(1);
-          populateScheduleGrid();
+          populateScheduleGrid(viewModel.getState().getValue().getScheduleEntries());
         });
 
-    employeeFilterComboBox = createEmployeeFilterComboBox();
-
-    HBox weekNavBar = new HBox(WEEK_NAV_BAR_SPACING);
-    weekNavBar.setAlignment(Pos.CENTER);
-    weekNavBar.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(weekNavBar, Priority.ALWAYS);
-    weekNavBar
-        .getChildren()
-        .addAll(prevWeekButton, weekDateRangeLabel, nextWeekButton, employeeFilterComboBox);
-    return weekNavBar;
-  }
-
-  private ComboBox<Employee> createEmployeeFilterComboBox() {
-    ComboBox<Employee> comboBox = new ComboBox<>();
-    comboBox.setPromptText(EMPLOYEE_FILTER_PROMPT_TEXT);
-    List<Employee> employees = viewModel.getEmployees();
-    comboBox.getItems().add(null);
-    comboBox.getItems().addAll(employees);
-    comboBox.setConverter(
+    employeeFilterComboBox = new ComboBox<>();
+    employeeFilterComboBox.setPromptText(EMPLOYEE_FILTER_PROMPT_TEXT);
+    employeeFilterComboBox.setConverter(
         new StringConverter<Employee>() {
           @Override
           public String toString(Employee employee) {
@@ -152,18 +165,50 @@ public class SchedulerScreen extends VBox {
           }
         });
 
-    if (!employees.isEmpty()) {
-      comboBox.getSelectionModel().select(0);
-    } else {
-      comboBox.getSelectionModel().select(null);
-    }
-    selectedEmployee = comboBox.getSelectionModel().getSelectedItem();
-    comboBox.setOnAction(
+    employeeFilterComboBox.setOnAction(
         e -> {
-          selectedEmployee = comboBox.getSelectionModel().getSelectedItem();
-          populateScheduleGrid();
+          selectedEmployee = employeeFilterComboBox.getSelectionModel().getSelectedItem();
+          populateScheduleGrid(viewModel.getState().getValue().getScheduleEntries());
         });
-    return comboBox;
+
+    Button newTaskButton = new Button(NEW_TASK_BUTTON_TEXT);
+    newTaskButton.setStyle(AppTheme.getButtonStyle(AppTheme.PRIMARY_COLOR));
+    newTaskButton.setOnAction(
+        e -> {
+          ScheduleEditDialog dialog =
+              new ScheduleEditDialog(null, viewModel.getState().getValue().getEmployees());
+          dialog.setOnSave(viewModel::addScheduleEntry);
+          dialog.showAndWait();
+        });
+
+    HBox weekNavBar = new HBox(WEEK_NAV_BAR_SPACING);
+    weekNavBar.setAlignment(Pos.CENTER);
+    weekNavBar.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(weekNavBar, Priority.ALWAYS);
+    weekNavBar
+        .getChildren()
+        .addAll(
+            prevWeekButton,
+            weekDateRangeLabel,
+            nextWeekButton,
+            employeeFilterComboBox,
+            newTaskButton);
+    return weekNavBar;
+  }
+
+  private void updateEmployeeFilterComboBox(List<Employee> employees) {
+    Employee previouslySelected = employeeFilterComboBox.getSelectionModel().getSelectedItem();
+
+    employeeFilterComboBox.getItems().clear();
+    employeeFilterComboBox.getItems().add(null);
+    employeeFilterComboBox.getItems().addAll(employees);
+
+    if (previouslySelected != null && employees.contains(previouslySelected)) {
+      employeeFilterComboBox.getSelectionModel().select(previouslySelected);
+    } else {
+      employeeFilterComboBox.getSelectionModel().select(null);
+    }
+    selectedEmployee = employeeFilterComboBox.getSelectionModel().getSelectedItem();
   }
 
   private ScrollPane createScheduleGridAndScrollPane() {
@@ -205,7 +250,7 @@ public class SchedulerScreen extends VBox {
       scheduleGrid.getColumnConstraints().add(dayColumn);
     }
 
-    for (int i = 0; i < (END_HOUR - START_HOUR); i++) {
+    for (int i = 0; i <= (END_HOUR - START_HOUR); i++) {
       RowConstraints rowConstraints = new RowConstraints();
       rowConstraints.setMinHeight(HOUR_SLOT_HEIGHT);
       rowConstraints.setVgrow(Priority.ALWAYS);
@@ -213,9 +258,8 @@ public class SchedulerScreen extends VBox {
     }
   }
 
-  private void initializeEmployeeColors() {
+  private void initializeEmployeeColors(List<Employee> employees) {
     employeeColorMap = new HashMap<>();
-    List<Employee> employees = viewModel.getEmployees();
     for (int i = 0; i < employees.size(); i++) {
       Employee employee = employees.get(i);
       String color = TASK_COLORS[i % TASK_COLORS.length];
@@ -223,13 +267,13 @@ public class SchedulerScreen extends VBox {
     }
   }
 
-  private void populateScheduleGrid() {
+  private void populateScheduleGrid(List<ScheduleEntry> scheduleEntries) {
     scheduleGrid.getChildren().clear();
     updateWeekDateRangeLabel();
     addDayHeadersToGrid();
     addTimeLabelsToGrid();
     addBackgroundCellsToGrid();
-    addScheduleEntriesToGrid();
+    addScheduleEntriesToGrid(scheduleEntries);
   }
 
   private void updateWeekDateRangeLabel() {
@@ -271,7 +315,7 @@ public class SchedulerScreen extends VBox {
   }
 
   private void addBackgroundCellsToGrid() {
-    for (int r = 1; r <= (END_HOUR - START_HOUR); r++) {
+    for (int r = 1; r <= (END_HOUR - START_HOUR) + 1; r++) {
       for (int c = 1; c <= DAYS_IN_WEEK; c++) {
         Region backgroundCell = new Region();
         backgroundCell.setStyle(
@@ -287,9 +331,9 @@ public class SchedulerScreen extends VBox {
     }
   }
 
-  private void addScheduleEntriesToGrid() {
+  private void addScheduleEntriesToGrid(List<ScheduleEntry> scheduleEntries) {
     List<ScheduleEntry> filteredEntries =
-        viewModel.getScheduleEntries().stream()
+        scheduleEntries.stream()
             .filter(
                 entry ->
                     !entry.getDate().isBefore(currentWeekStart)
@@ -297,9 +341,11 @@ public class SchedulerScreen extends VBox {
             .filter(
                 entry ->
                     selectedEmployee == null
-                        || entry.getAssignedEmployee().equals(selectedEmployee))
+                        || (selectedEmployee != null
+                            && entry.getAssignedEmployee() != null
+                            && entry.getAssignedEmployee().equals(selectedEmployee)))
             .sorted(Comparator.comparing(ScheduleEntry::getStartTime))
-            .collect(Collectors.toList());
+            .toList();
 
     for (ScheduleEntry entry : filteredEntries) {
       int colIndex = entry.getDate().getDayOfWeek().getValue();
@@ -328,9 +374,12 @@ public class SchedulerScreen extends VBox {
         (entry.getEndTime().toSecondOfDay() - entry.getStartTime().toSecondOfDay()) / 3600.0;
     int calculatedRowSpan =
         (int) Math.ceil(durationInHours + (entry.getStartTime().getMinute() / 60.0));
+
     if (calculatedRowSpan == 0 && durationInHours > 0) calculatedRowSpan = 1;
+
     int maxPossibleRowSpan = (END_HOUR - START_HOUR) - (startHourGridRow - 1);
     calculatedRowSpan = Math.min(calculatedRowSpan, maxPossibleRowSpan);
+
     if (calculatedRowSpan < 1) calculatedRowSpan = 1;
     return calculatedRowSpan;
   }
@@ -379,6 +428,16 @@ public class SchedulerScreen extends VBox {
         "-fx-font-size: 9px; -fx-text-fill: " + AppTheme.TEXT_COLOR_SECONDARY + ";");
 
     entryDetailsBox.getChildren().addAll(taskLabel, employeeLabel, timeRangeLabel);
+
+    entryDetailsBox.setOnMouseClicked(
+        event -> {
+          if (event.getClickCount() == 1) {
+            ScheduleEditDialog dialog =
+                new ScheduleEditDialog(entry, viewModel.getState().getValue().getEmployees());
+            dialog.setOnSave(viewModel::updateScheduleEntry);
+            dialog.showAndWait();
+          }
+        });
     return entryDetailsBox;
   }
 }

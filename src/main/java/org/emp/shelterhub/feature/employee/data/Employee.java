@@ -1,5 +1,7 @@
 package org.emp.shelterhub.feature.employee.data;
 
+import java.util.Objects;
+
 public class Employee {
   private int employeeId;
   private String firstName;
@@ -26,7 +28,6 @@ public class Employee {
     this.phoneNumber = phoneNumber;
   }
 
-  // Getters
   public int getEmployeeId() {
     return employeeId;
   }
@@ -81,5 +82,23 @@ public class Employee {
 
   public void setPhoneNumber(String phoneNumber) {
     this.phoneNumber = phoneNumber;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Employee employee = (Employee) o;
+    return employeeId == employee.employeeId;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(employeeId);
+  }
+
+  @Override
+  public String toString() {
+    return firstName + " " + lastName;
   }
 }

@@ -35,6 +35,30 @@ public class EmployeesDAO {
     return list;
   }
 
+  public EmployeeEntity getById(int id) {
+    String query = "SELECT * FROM pracownicy WHERE id_pracownika = ?";
+    try (Connection conn = SHDataBase.connect();
+        PreparedStatement ps = conn.prepareStatement(query)) {
+
+      ps.setInt(1, id);
+      try (ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+          return new EmployeeEntity(
+              rs.getInt("id_pracownika"),
+              rs.getString("imie1"),
+              rs.getString("imie2"),
+              rs.getString("nazwisko"),
+              rs.getString("data_ur"),
+              rs.getString("adres"),
+              rs.getString("telefon"));
+        }
+      }
+    } catch (SQLException e) {
+      System.out.println("Błąd pobierania pracownika po ID: " + e.getMessage());
+    }
+    return null;
+  }
+
   public boolean addEmployee(EmployeeEntity emp) {
     String sql =
         "INSERT INTO pracownicy (imie1, imie2, nazwisko, data_ur, adres, telefon) VALUES (?, ?, ?, ?, ?, ?)";

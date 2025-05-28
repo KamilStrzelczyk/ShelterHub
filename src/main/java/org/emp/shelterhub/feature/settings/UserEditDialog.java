@@ -39,7 +39,6 @@ public class UserEditDialog extends Stage {
     titleLabel.setStyle(
         AppTheme.getLabelStyle(Dimensions.FONT_SIZE_TITLE, true, AppTheme.TEXT_COLOR_PRIMARY));
 
-    // Pola do edycji
     emailField = createTextField("Email:", user.getEmail());
     phoneNumberField = createTextField("Numer Telefonu:", user.getPhoneNumber());
 

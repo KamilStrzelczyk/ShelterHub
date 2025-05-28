@@ -36,10 +36,7 @@ public class MainContainer {
           case REPORT -> new ReportScreen();
           case SETTINGS -> new SettingsScreen();
           case HELP -> new HelpScreen();
-          case ABOUT -> {
-            AboutScreen aboutScreen = new AboutScreen();
-            yield aboutScreen.show("Test");
-          }
+          case ABOUT -> new AboutScreen();
         };
     screenContainer.getChildren().setAll(view);
   }

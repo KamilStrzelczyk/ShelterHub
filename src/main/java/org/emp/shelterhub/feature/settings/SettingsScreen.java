@@ -17,14 +17,14 @@ public class SettingsScreen extends VBox {
 
   private SettingsScreenViewModel viewModel = new SettingsScreenViewModel();
 
-  private Label usernameLabel;
-  private Label emailDisplayLabel;
-  private Label phoneNumberDisplayLabel;
-  private Label roleLabel;
+  private final Label usernameLabel;
+  private final Label emailDisplayLabel;
+  private final Label phoneNumberDisplayLabel;
+  private final Label roleLabel;
 
-  private PasswordField currentPasswordField;
-  private PasswordField newPasswordField;
-  private Label passwordFeedbackLabel;
+  private final PasswordField currentPasswordField;
+  private final PasswordField newPasswordField;
+  private final Label passwordFeedbackLabel;
 
   public SettingsScreen() {
     this.setSpacing(Dimensions.SPACING_LARGE);
@@ -117,7 +117,8 @@ public class SettingsScreen extends VBox {
               currentPasswordField.clear();
               newPasswordField.clear();
             } else {
-              passwordFeedbackLabel.setText("Obecne hasło jest niepoprawne.");
+              passwordFeedbackLabel.setText(
+                  "Obecne hasło jest niepoprawne lub nowe hasło nie spełnia wymagań.");
               passwordFeedbackLabel.setStyle("-fx-text-fill: " + AppTheme.ERROR_COLOR + ";");
             }
           }

@@ -123,6 +123,24 @@ public class SHDataBase {
                 );
                 """);
 
+        stmt.execute(
+            """
+                    CREATE TABLE IF NOT EXISTS uzytkownicy (
+                        id_uzytkownika INTEGER PRIMARY KEY AUTOINCREMENT,
+                        login TEXT NOT NULL UNIQUE,
+                        haslo TEXT NOT NULL,
+                        rola TEXT CHECK (rola IN ('admin', 'kierownik', 'pracownik')) NOT NULL,
+                        id_pracownika INTEGER,
+                        FOREIGN KEY (id_pracownika) REFERENCES pracownicy(id_pracownika)
+                    );
+                """);
+
+        stmt.executeUpdate(
+            """
+                    INSERT OR IGNORE INTO uzytkownicy (login, haslo, rola)
+                    VALUES ('admin', 'okoń', 'admin');
+                """);
+
         System.out.println("Baza danych została utworzona pomyślnie.");
       } else {
         System.out.println("Używanie istniejącej bazy danych.");

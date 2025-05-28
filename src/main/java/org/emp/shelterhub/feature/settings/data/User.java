@@ -1,29 +1,29 @@
 package org.emp.shelterhub.feature.settings.data;
 
 public class User {
-  private String id;
+  private int id;
   private String username;
   private String email;
   private String phoneNumber;
   private UserRole userRole;
-  private String passwordHash;
+  private String password;
 
   public User(
-      String id,
+      int id,
       String username,
       String email,
       String phoneNumber,
       UserRole userRole,
-      String passwordHash) {
+      String password) {
     this.id = id;
     this.username = username;
     this.email = email;
     this.phoneNumber = phoneNumber;
     this.userRole = userRole;
-    this.passwordHash = passwordHash;
+    this.password = password;
   }
 
-  public String getId() {
+  public int getId() {
     return id;
   }
 
@@ -43,11 +43,11 @@ public class User {
     return userRole;
   }
 
-  public String getPasswordHash() {
-    return passwordHash;
+  public String getPassword() {
+    return password;
   }
 
-  public void setId(String id) {
+  public void setId(int id) {
     this.id = id;
   }
 
@@ -67,7 +67,7 @@ public class User {
     this.userRole = userRole;
   }
 
-  public void setPasswordHash(String passwordHash) {
-    this.passwordHash = passwordHash;
+  public void setPassword(String password) {
+    this.password = password;
   }
 }

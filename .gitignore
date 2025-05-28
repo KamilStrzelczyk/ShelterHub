@@ -46,6 +46,5 @@ log/
 # System and temporary files
 Thumbs.db
 ehthumbs.db
-shelterhub.db
 *.swp
 *.swo

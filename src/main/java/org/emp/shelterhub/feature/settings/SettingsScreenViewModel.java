@@ -1,42 +1,27 @@
 package org.emp.shelterhub.feature.settings;
 
 import org.emp.shelterhub.feature.settings.data.User;
-import org.emp.shelterhub.feature.settings.data.UserRole;
-import org.emp.shelterhub.lib.domain.IsValidatePasswordUseCase; // Poprawny import dla walidacji
-
-// hasła
+import org.emp.shelterhub.lib.domain.IsValidatePasswordUseCase;
+import org.emp.shelterhub.lib.infrastructure.repository.UserRepository;
 
 public class SettingsScreenViewModel {
 
-  private User currentUser;
-  private IsValidatePasswordUseCase validatePasswordUseCase;
-
-  public SettingsScreenViewModel() {
-    currentUser =
-        new User(
-            "user123",
-            "adminUser",
-            "admin@shelterhub.com",
-            "111-222-333",
-            UserRole.ADMINISTRATOR,
-            "hashed_password_123");
-    validatePasswordUseCase = new IsValidatePasswordUseCase();
-  }
+  private User currentUser = UserRepository.getInstance().getLoggedUser();
+  private IsValidatePasswordUseCase validatePasswordUseCase = new IsValidatePasswordUseCase();
 
   public User getCurrentUser() {
     return currentUser;
   }
 
   public boolean updatePassword(String currentPassword, String newPassword) {
-    // Walidacja nowego hasła za pomocą IsValidatePasswordUseCase
     if (!validatePasswordUseCase.passwordIsValidate(newPassword)) {
       System.out.println(
           "Nowe hasło nie spełnia wymagań walidacji: musi mieć od 8 do 12 znaków, zawierać cyfrę, małą literę, dużą literę i znak specjalny.");
       return false;
     }
 
-    if (("hashed_" + currentPassword).equals(currentUser.getPasswordHash())) {
-      currentUser.setPasswordHash("hashed_" + newPassword);
+    if (currentPassword.equals(currentUser.getPassword())) {
+      currentUser.setPassword(newPassword);
       System.out.println(
           "Hasło dla użytkownika " + currentUser.getUsername() + " zostało zmienione.");
       return true;

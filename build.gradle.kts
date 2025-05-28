@@ -1,9 +1,10 @@
 plugins {
     id("java")
     id("application")
-    id("checkstyle")
     id("org.openjfx.javafxplugin") version "0.1.0"
+    id("checkstyle")
     id("com.diffplug.spotless") version "6.25.0"
+    id("org.beryx.jlink") version "3.1.1"
 }
 
 group = "org.emp.shelterhub"
@@ -54,12 +55,33 @@ javafx {
 }
 
 dependencies {
+    implementation("org.openjfx:javafx-controls:21")
+    implementation("org.openjfx:javafx-fxml:21")
+    implementation("org.openjfx:javafx-graphics:21")
+    implementation("org.openjfx:javafx-base:21")
+
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
+
 tasks.test {
     useJUnitPlatform()
+}
+
+
+jlink {
+    options = listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages")
+    launcher {
+        name = "shelterhub"
+    }
+    jpackage {
+        imageName = "ShelterHubApp"
+        installerName = "ShelterHubInstaller"
+        installerType = "exe"
+    }
+    forceMerge("javafx.*", "org.xerial.sqlite-jdbc")
 }

@@ -44,7 +44,9 @@ logs/
 log/
 
 # System and temporary files
+META-INF
 Thumbs.db
 ehthumbs.db
+shelterhub.db
 *.swp
 *.swo

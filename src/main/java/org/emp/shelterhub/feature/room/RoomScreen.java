@@ -1,23 +1,29 @@
 package org.emp.shelterhub.feature.room;
 
+import io.reactivex.rxjava3.disposables.Disposable;
+import java.util.List;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import org.emp.shelterhub.feature.room.data.Room;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 
 public class RoomScreen extends VBox {
+
   private static final int COLUMNS = 3;
 
-  RoomScreenViewModel viewModel = new RoomScreenViewModel();
+  private final RoomScreenViewModel viewModel;
+  private final GridPane grid;
+  private Disposable stateDisposable;
 
   public RoomScreen() {
+    this.viewModel = new RoomScreenViewModel();
+
     this.setSpacing(10);
     this.setPadding(new Insets(20));
     this.setAlignment(Pos.TOP_CENTER);
@@ -27,7 +33,30 @@ public class RoomScreen extends VBox {
     title.setFont(new Font(24));
     title.setStyle("-fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
 
-    GridPane grid = new GridPane();
+    Button addRoomButton = new Button("Dodaj Pokój");
+    addRoomButton.setStyle(
+        "-fx-background-color: "
+            + AppTheme.PRIMARY_COLOR
+            + "; -fx-text-fill: "
+            + AppTheme.TEXT_COLOR_LIGHT
+            + "; -fx-font-size: 14px; -fx-padding: 8 15; -fx-background-radius: 5;");
+    addRoomButton.setOnAction(
+        e -> {
+          RoomEditDialog dialog = new RoomEditDialog(null);
+          dialog.setOnSave(updatedRoom -> viewModel.addNewRoom(updatedRoom));
+          dialog.showAndWait();
+        });
+
+    HBox topBar = new HBox(10);
+    topBar.setAlignment(Pos.CENTER_LEFT);
+    topBar.getChildren().add(title);
+
+    Region spacer = new Region();
+    HBox.setHgrow(spacer, Priority.ALWAYS);
+    topBar.getChildren().add(spacer);
+    topBar.getChildren().add(addRoomButton);
+
+    grid = new GridPane();
     grid.setHgap(10);
     grid.setVgap(10);
 
@@ -38,10 +67,37 @@ public class RoomScreen extends VBox {
       grid.getColumnConstraints().add(column);
     }
 
+    VBox contentContainer = new VBox(10);
+    contentContainer.getChildren().addAll(topBar, grid);
+    contentContainer.setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
+
+    ScrollPane scrollPane = new ScrollPane(contentContainer);
+    scrollPane.setFitToWidth(true);
+    scrollPane.setFitToHeight(true);
+    scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+    scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    scrollPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+
+    this.getChildren().add(scrollPane);
+    VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+    stateDisposable =
+        viewModel
+            .getState()
+            .observeOn(
+                io.reactivex.rxjava3.schedulers.Schedulers
+                    .trampoline()) // zastępuje Platform.runLater (niżej i tak robimy runLater)
+            .subscribe(state -> Platform.runLater(() -> updateUI(state)));
+  }
+
+  private void updateUI(RoomScreenState state) {
+    grid.getChildren().clear();
+
+    List<Room> rooms = state.getRooms();
+
     int columnIndex = 0;
     int rowIndex = 0;
-
-    for (Room room : viewModel.getRooms()) {
+    for (Room room : rooms) {
       GridPane roomItem = createRoomItem(room);
       grid.add(roomItem, columnIndex, rowIndex);
       GridPane.setHgrow(roomItem, Priority.ALWAYS);
@@ -53,67 +109,47 @@ public class RoomScreen extends VBox {
       }
     }
 
-    VBox contentContainer = new VBox(10);
-    contentContainer.getChildren().addAll(title, grid);
-    contentContainer.setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
+    if (state.isLoading()) {
+      System.out.println("Ładowanie danych...");
+    }
 
-    ScrollPane scrollPane = new ScrollPane();
-    scrollPane.setContent(contentContainer);
-    scrollPane.setFitToWidth(true);
-    scrollPane.setFitToHeight(true);
-    scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-    scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-    scrollPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-
-    this.getChildren().add(scrollPane);
-
-    VBox.setVgrow(scrollPane, Priority.ALWAYS);
+    if (state.getErrorMessage() != null) {
+      System.err.println("Błąd: " + state.getErrorMessage());
+    }
   }
 
   private GridPane createRoomItem(Room room) {
     GridPane container = getGridPane(room);
 
-    Label roomNumberLabel = new Label("Pokój: " + room.getRoomNumber());
+    Label roomNumberLabel = new Label("Room: " + room.getRoomNumber());
     roomNumberLabel.setStyle(
         "-fx-font-size: 16px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
 
-    Label roomTypeLabel = new Label("Typ: " + room.getRoomType());
+    Label roomTypeLabel = new Label("Type: " + room.getRoomType());
     roomTypeLabel.setStyle(
         "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_SECONDARY + ";");
 
-    Label roomStatusLabel = new Label(room.isOccupied() ? "Zajęty" : "Wolny");
-    roomStatusLabel.setStyle(
-        "-fx-font-size: 14px; -fx-text-fill: "
-            + (room.isOccupied() ? AppTheme.ERROR_COLOR : AppTheme.SUCCESS_COLOR)
-            + ";");
+    Label roomStateLabel = new Label("Status: " + room.getRoomState());
+    String color;
+    switch (room.getRoomState()) {
+      case OCCUPIED, OUT_OF_ORDER -> color = AppTheme.ERROR_COLOR;
+      case DIRTY -> color = AppTheme.WARNING_COLOR;
+      case FREE -> color = AppTheme.SUCCESS_COLOR;
+      default -> color = AppTheme.TEXT_COLOR_PRIMARY;
+    }
+    roomStateLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: " + color + ";");
 
-    Label isCleanTextLabel = new Label("Czysty:");
-    isCleanTextLabel.setStyle(
-        "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
-    Label isCleanStatusLabel = createBooleanStatusLabel(room.isClean());
-
-    Label isAvailableTextLabel = new Label("Dostępny:");
+    Label isAvailableTextLabel = new Label("Available:");
     isAvailableTextLabel.setStyle(
         "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
     Label isAvailableStatusLabel = createBooleanStatusLabel(room.isAvailable());
 
-    Label hasMalfunctionTextLabel = new Label("Awaria:");
-    hasMalfunctionTextLabel.setStyle(
-        "-fx-font-size: 14px; -fx-text-fill: " + AppTheme.TEXT_COLOR_PRIMARY + ";");
-    Label hasMalfunctionStatusLabel = createBooleanStatusLabel(room.hasMalfunction());
-
     container.add(roomNumberLabel, 0, 0, 2, 1);
     container.add(roomTypeLabel, 0, 1, 2, 1);
-    container.add(roomStatusLabel, 0, 2, 2, 1);
+    container.add(roomStateLabel, 0, 2, 2, 1);
 
-    container.add(isCleanTextLabel, 0, 3);
-    container.add(isCleanStatusLabel, 1, 3);
-
-    container.add(isAvailableTextLabel, 0, 4);
-    container.add(isAvailableStatusLabel, 1, 4);
-
-    container.add(hasMalfunctionTextLabel, 0, 5);
-    container.add(hasMalfunctionStatusLabel, 1, 5);
+    container.add(isAvailableTextLabel, 0, 3);
+    container.add(isAvailableStatusLabel, 1, 3);
 
     return container;
   }
@@ -134,10 +170,7 @@ public class RoomScreen extends VBox {
     container.setOnMouseClicked(
         e -> {
           RoomEditDialog dialog = new RoomEditDialog(room);
-          dialog.setOnSave(
-              updatedRoom -> {
-                viewModel.handleRoomUpdate(updatedRoom);
-              });
+          dialog.setOnSave(updatedRoom -> viewModel.updateRoom(updatedRoom));
           dialog.showAndWait();
         });
     return container;

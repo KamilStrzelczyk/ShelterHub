@@ -4,39 +4,21 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.emp.shelterhub.lib.db.database.SHDataBase;
+import org.emp.shelterhub.lib.db.entity.RoomEntity;
 
 public class RoomsDAO {
-  public static class Room {
-    public int kod_pokoj;
-    public String dostepnosc;
-    public String stan;
-    public String typ;
-    public double cena;
 
-    public Room(int kod_pokoj, String dostepnosc, String stan, String typ, double cena) {
-      this.kod_pokoj = kod_pokoj;
-      this.dostepnosc = dostepnosc;
-      this.stan = stan;
-      this.typ = typ;
-      this.cena = cena;
-    }
-
-    public Room(String dostepnosc, String stan, String typ, double cena) {
-      this(-1, dostepnosc, stan, typ, cena);
-    }
-  }
-
-  public List<Room> getRooms() {
+  public List<RoomEntity> getRooms() {
     String query = "SELECT * FROM pokoje";
     return executeSelectQuery(query);
   }
 
-  public List<Room> getAvailableRooms() {
+  public List<RoomEntity> getAvailableRooms() {
     String query = "SELECT * FROM pokoje WHERE dostepnosc = 'dostepny'";
     return executeSelectQuery(query);
   }
 
-  public boolean addRoom(Room room) {
+  public boolean addRoom(RoomEntity room) {
     String query = "INSERT INTO pokoje (dostepnosc, stan, typ, cena_za_noc) VALUES (?, ?, ?, ?)";
 
     try (Connection conn = SHDataBase.connect();
@@ -53,7 +35,7 @@ public class RoomsDAO {
     }
   }
 
-  public boolean updateRoom(Room room) {
+  public boolean updateRoom(RoomEntity room) {
     String sql =
         "UPDATE pokoje SET dostepnosc = ?, stan = ?, typ = ?, cena_za_noc = ? WHERE kod_pokoj = ?";
 
@@ -90,8 +72,8 @@ public class RoomsDAO {
     }
   }
 
-  private List<Room> executeSelectQuery(String query) {
-    List<Room> rooms = new ArrayList<>();
+  private List<RoomEntity> executeSelectQuery(String query) {
+    List<RoomEntity> rooms = new ArrayList<>();
 
     try (Connection conn = SHDataBase.connect();
         Statement stmt = conn.createStatement();
@@ -99,9 +81,8 @@ public class RoomsDAO {
 
       while (rs.next()) {
         rooms.add(
-            new Room(
+            new RoomEntity(
                 rs.getInt("kod_pokoj"),
-                rs.getString("dostepnosc"),
                 rs.getString("stan"),
                 rs.getString("typ"),
                 rs.getDouble("cena_za_noc")));

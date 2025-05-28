@@ -1,6 +1,10 @@
 module org.emp.shelterhub {
   requires javafx.controls;
   requires javafx.fxml;
+  requires java.desktop;
+  requires java.sql;
+  requires org.xerial.sqlitejdbc;
+  requires io.reactivex.rxjava3;
 
   opens org.emp.shelterhub.app to
       javafx.fxml;

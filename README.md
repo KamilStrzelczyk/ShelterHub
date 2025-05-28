@@ -14,3 +14,15 @@ To manually check and auto-format the code, use the following command:
 
 ```bash
 ./gradlew fixAndCheck
+```
+
+### 🚀 Build and package with jlink
+
+ShelterHub uses **jlink** to create a custom runtime image containing only the required modules of the JDK and the application itself.  
+This approach results in a lightweight, self-contained executable package optimized for distribution and deployment.
+
+To build a clean project and generate the custom runtime image, run:
+
+```bash
+./gradlew clean jlink
+```

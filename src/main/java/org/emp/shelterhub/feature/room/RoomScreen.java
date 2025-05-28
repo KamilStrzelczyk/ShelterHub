@@ -43,7 +43,7 @@ public class RoomScreen extends VBox {
     addRoomButton.setOnAction(
         e -> {
           RoomEditDialog dialog = new RoomEditDialog(null);
-          dialog.setOnSave(updatedRoom -> viewModel.addNewRoom(updatedRoom));
+          dialog.setOnSave(viewModel::addNewRoom);
           dialog.showAndWait();
         });
 
@@ -84,9 +84,7 @@ public class RoomScreen extends VBox {
     stateDisposable =
         viewModel
             .getState()
-            .observeOn(
-                io.reactivex.rxjava3.schedulers.Schedulers
-                    .trampoline()) // zastępuje Platform.runLater (niżej i tak robimy runLater)
+            .observeOn(io.reactivex.rxjava3.schedulers.Schedulers.trampoline())
             .subscribe(state -> Platform.runLater(() -> updateUI(state)));
   }
 

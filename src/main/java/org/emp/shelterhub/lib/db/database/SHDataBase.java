@@ -110,6 +110,19 @@ public class SHDataBase {
                     );
                 """);
 
+        stmt.execute(
+            """
+                CREATE TABLE IF NOT EXISTS scheduler (
+                    id INTEGER PRIMARY KEY,
+                    date TEXT NOT NULL,
+                    start_time TEXT NOT NULL,
+                    end_time TEXT NOT NULL,
+                    id_pracownika INTEGER NOT NULL,
+                    task_description TEXT,
+                    FOREIGN KEY (id_pracownika) REFERENCES pracownicy(id_pracownika)
+                );
+                """);
+
         System.out.println("Baza danych została utworzona pomyślnie.");
       } else {
         System.out.println("Używanie istniejącej bazy danych.");

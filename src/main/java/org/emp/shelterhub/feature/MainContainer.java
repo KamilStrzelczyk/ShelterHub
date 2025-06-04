@@ -8,7 +8,7 @@ import org.emp.shelterhub.feature.employee.EmployeeScreen;
 import org.emp.shelterhub.feature.help.HelpScreen;
 import org.emp.shelterhub.feature.navigation.NavigationBar;
 import org.emp.shelterhub.feature.navigation.NavigationBarButton;
-import org.emp.shelterhub.feature.report.ReportScreen;
+import org.emp.shelterhub.feature.report.presentation.ReportScreen;
 import org.emp.shelterhub.feature.room.RoomScreen;
 import org.emp.shelterhub.feature.scheduler.SchedulerScreen;
 import org.emp.shelterhub.feature.settings.SettingsScreen;

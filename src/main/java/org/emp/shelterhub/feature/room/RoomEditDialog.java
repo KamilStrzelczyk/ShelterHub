@@ -123,7 +123,7 @@ public class RoomEditDialog extends Stage {
 
     if (room == null) {
       int roomNumber = Integer.parseInt(roomNumberField.getText().trim());
-      room = new Room(roomNumber, roomTypeComboBox.getValue());
+      room = new Room(roomNumber, roomTypeComboBox.getValue(), roomStateComboBox.getValue());
     }
 
     room.setRoomType(roomTypeComboBox.getValue());

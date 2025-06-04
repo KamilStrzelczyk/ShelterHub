@@ -19,14 +19,13 @@ public class RoomsDAO {
   }
 
   public boolean addRoom(RoomEntity room) {
-    String query = "INSERT INTO pokoje (dostepnosc, stan, typ, cena_za_noc) VALUES (?, ?, ?, ?)";
+    String query = "INSERT INTO pokoje (stan, typ, cena_za_noc) VALUES (?, ?, ?)";
 
     try (Connection conn = SHDataBase.connect();
         PreparedStatement ps = conn.prepareStatement(query)) {
-      ps.setString(1, room.dostepnosc);
-      ps.setString(2, room.stan);
-      ps.setString(3, room.typ);
-      ps.setDouble(4, room.cena);
+      ps.setString(1, room.stan);
+      ps.setString(2, room.typ);
+      ps.setDouble(3, room.cena);
       ps.executeUpdate();
       return true;
     } catch (SQLException e) {
@@ -36,17 +35,14 @@ public class RoomsDAO {
   }
 
   public boolean updateRoom(RoomEntity room) {
-    String sql =
-        "UPDATE pokoje SET dostepnosc = ?, stan = ?, typ = ?, cena_za_noc = ? WHERE kod_pokoj = ?";
+    String sql = "UPDATE pokoje SET stan = ?, typ = ?, cena_za_noc = ? WHERE kod_pokoj = ?";
 
     try (Connection conn = SHDataBase.connect();
         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-      ps.setString(1, room.dostepnosc);
-      ps.setString(2, room.stan);
-      ps.setString(3, room.typ);
-      ps.setDouble(4, room.cena);
-      ps.setInt(5, room.kod_pokoj);
+      ps.setString(1, room.stan);
+      ps.setString(2, room.typ);
+      ps.setDouble(3, room.cena);
+      ps.setInt(4, room.kod_pokoj);
       ps.executeUpdate();
       return true;
 

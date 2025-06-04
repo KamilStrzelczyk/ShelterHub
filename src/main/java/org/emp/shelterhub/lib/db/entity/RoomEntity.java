@@ -2,7 +2,6 @@ package org.emp.shelterhub.lib.db.entity;
 
 public class RoomEntity {
   public int kod_pokoj;
-  public String dostepnosc;
   public String stan;
   public String typ;
   public double cena;

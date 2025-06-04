@@ -12,7 +12,6 @@ version = "0.1.0"
 
 application {
     mainClass.set("org.emp.shelterhub.app.Main")
-    mainModule.set("org.emp.shelterhub")
 }
 
 checkstyle {
@@ -57,12 +56,14 @@ javafx {
 dependencies {
     implementation("org.openjfx:javafx-controls:21")
     implementation("org.openjfx:javafx-fxml:21")
-    implementation("org.openjfx:javafx-graphics:21")
+    implementation("org.openjfx:javafx-graphics:21.0.2")
     implementation("org.openjfx:javafx-base:21")
 
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
     implementation("io.reactivex.rxjava3:rxjava:3.1.8")
-
+    implementation("org.apache.poi:poi-ooxml:5.4.0")
+    implementation("org.apache.poi:poi:5.2.5")
+    implementation("org.apache.commons:commons-math3:3.6.1")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

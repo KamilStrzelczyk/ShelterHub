@@ -45,6 +45,8 @@ log/
 
 # System and temporary files
 META-INF
+grafik_pracownikow.xlsx
+raport_pokoi.xlsx
 Thumbs.db
 ehthumbs.db
 shelterhub.db

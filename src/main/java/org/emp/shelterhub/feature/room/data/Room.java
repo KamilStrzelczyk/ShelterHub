@@ -5,10 +5,10 @@ public class Room {
   private RoomType roomType;
   private RoomState roomState;
 
-  public Room(int roomNumber, RoomType roomType) {
+  public Room(int roomNumber, RoomType roomType, RoomState roomState) {
     this.roomNumber = roomNumber;
     this.roomType = roomType;
-    this.roomState = RoomState.FREE;
+    this.roomState = roomState;
   }
 
   public int getRoomNumber() {

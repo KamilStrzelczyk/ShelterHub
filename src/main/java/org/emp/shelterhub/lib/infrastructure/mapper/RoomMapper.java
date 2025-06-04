@@ -8,8 +8,9 @@ import org.emp.shelterhub.lib.db.entity.RoomEntity;
 public class RoomMapper {
 
   public static Room toDomain(RoomEntity entity) {
-    Room room = new Room(entity.kod_pokoj, RoomType.fromDbValue(entity.typ));
-    room.setRoomState(RoomState.fromDbValue(entity.stan));
+    Room room =
+        new Room(
+            entity.kod_pokoj, RoomType.fromDbValue(entity.typ), RoomState.fromDbValue(entity.stan));
     return room;
   }
 

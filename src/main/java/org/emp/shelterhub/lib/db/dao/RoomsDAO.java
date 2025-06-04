@@ -45,6 +45,7 @@ public class RoomsDAO {
       ps.setInt(4, room.kod_pokoj);
       ps.executeUpdate();
       return true;
+
     } catch (SQLException e) {
       System.out.println("Błąd aktualizacji pokoju: " + e.getMessage());
       return false;

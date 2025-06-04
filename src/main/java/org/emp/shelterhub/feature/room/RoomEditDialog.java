@@ -126,6 +126,9 @@ public class RoomEditDialog extends Stage {
       room = new Room(roomNumber, roomTypeComboBox.getValue(), roomStateComboBox.getValue());
     }
 
+    room.setRoomType(roomTypeComboBox.getValue());
+    room.setRoomState(roomStateComboBox.getValue());
+
     if (onSaveConsumer != null) {
       onSaveConsumer.accept(room);
     }

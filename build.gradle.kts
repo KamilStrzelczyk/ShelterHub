@@ -68,11 +68,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-
 tasks.test {
     useJUnitPlatform()
 }
-
 
 jlink {
     options = listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages")

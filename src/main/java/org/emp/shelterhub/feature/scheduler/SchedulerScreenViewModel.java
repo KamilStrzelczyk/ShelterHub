@@ -96,6 +96,7 @@ public class SchedulerScreenViewModel {
                     Platform.runLater(
                         () -> {
                           if (success) {
+                            // Po dodaniu odśwież listę wpisów
                             loadScheduleEntriesFromRepository();
                           } else {
                             stateSubject.onNext(

@@ -19,17 +19,17 @@ import org.emp.shelterhub.lib.infrastructure.repository.UserRepository;
 
 public class MainContainer {
 
-  private final BorderPane layout = new BorderPane();
   private final StackPane screenContainer = new StackPane();
-  private final StackPane rootPane; // Store the root pane
+  private final StackPane rootPane;
 
   public MainContainer(StackPane root) {
-    this.rootPane = root; // Store the root pane
+    this.rootPane = root;
     NavigationBar navigator = new NavigationBar();
+    BorderPane layout = new BorderPane();
     navigator.start(layout, this::showScreen);
     layout.setCenter(screenContainer);
 
-    TopBar topBar = new TopBar(this::performLogout); // Pass logout method reference
+    TopBar topBar = new TopBar(this::performLogout);
     layout.setTop(topBar);
 
     Footer footer = new Footer();
@@ -41,15 +41,10 @@ public class MainContainer {
   }
 
   private void performLogout() {
-    // 1. Clear user session
     UserRepository.getInstance().logout();
-
-    // 2. Clear the current UI (MainContainer's layout from rootPane)
-    if (rootPane != null) {
-      rootPane.getChildren().clear();
-      // 3. Show the WelcomeScreen again on the same rootPane
-      WelcomeScreen.show(rootPane);
-    }
+    rootPane.getChildren().clear();
+    WelcomeScreen welcomeScreen = new WelcomeScreen();
+    welcomeScreen.show(rootPane);
   }
 
   public void showScreen(NavigationBarButton screen) {

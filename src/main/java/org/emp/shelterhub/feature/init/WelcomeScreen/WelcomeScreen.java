@@ -18,17 +18,14 @@ public class WelcomeScreen {
       "System zarządzania Schroniskiem Górskim Wilcza Turnia";
   private static final String LOGO_IMAGE_URL = "/images/SHELTERHUB.Logo.png";
 
-  static WelcomeScreenViewModel viewModel = new WelcomeScreenViewModel();
+  private WelcomeScreenViewModel viewModel;
+  private Disposable stateSubscription;
 
-  private static Disposable stateSubscription;
-
-  public static void show(StackPane root) {
-    // Dispose previous subscription if exists and not disposed
+  public void show(StackPane root) {
+    viewModel = new WelcomeScreenViewModel();
     if (stateSubscription != null && !stateSubscription.isDisposed()) {
       stateSubscription.dispose();
     }
-    // Re-initialize the viewModel for a fresh state
-    viewModel = new WelcomeScreenViewModel();
 
     viewModel.setRoot(root);
     UIComponents ui = new UIComponents();

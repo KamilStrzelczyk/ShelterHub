@@ -1,6 +1,5 @@
 package org.emp.shelterhub.feature.topBar;
 
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -89,10 +88,11 @@ public class TopBar extends BorderPane {
   }
 
   private void setupActions() {
-    logoutButton.setOnAction(event -> {
-      if (onLogoutAction != null) {
-        onLogoutAction.run();
-      }
-    });
+    logoutButton.setOnAction(
+        event -> {
+          if (onLogoutAction != null) {
+            onLogoutAction.run();
+          }
+        });
   }
 }

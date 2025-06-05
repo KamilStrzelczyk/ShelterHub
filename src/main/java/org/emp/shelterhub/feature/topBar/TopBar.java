@@ -1,5 +1,6 @@
 package org.emp.shelterhub.feature.topBar;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,18 +16,21 @@ public class TopBar extends BorderPane {
   private ImageView logoImageView;
   private Button logoutButton;
   private ImageView userIconImageView;
+  private Runnable onLogoutAction;
 
-  public TopBar() {
+  public TopBar(Runnable onLogoutAction) {
+    this.onLogoutAction = onLogoutAction;
     initializeComponents();
     setupLayout();
     styleComponents();
+    setupActions();
   }
 
   private void initializeComponents() {
     try {
       Image logoImage = new Image(getClass().getResourceAsStream("/images/SHELTERHUB.Logo.png"));
       logoImageView = new ImageView(logoImage);
-      logoImageView.setFitHeight(130);
+      logoImageView.setFitHeight(88);
       logoImageView.setPreserveRatio(true);
     } catch (Exception e) {
       System.err.println("Could not load logo image: " + e.getMessage());
@@ -60,11 +64,11 @@ public class TopBar extends BorderPane {
 
     setPadding(new Insets(Dimensions.SPACING_MEDIUM));
 
-    setMinHeight(130);
+    setMinHeight(98);
   }
 
   private void styleComponents() {
-    setStyle("-fx-background-color: " + AppTheme.BACKGROUND_COLOR + ";");
+    setStyle("-fx-background-color: #CCCCCC;");
 
     String logoutButtonStyle =
         "-fx-background-color: "
@@ -82,5 +86,13 @@ public class TopBar extends BorderPane {
             + "-fx-min-width: 100px;";
 
     logoutButton.setStyle(logoutButtonStyle);
+  }
+
+  private void setupActions() {
+    logoutButton.setOnAction(event -> {
+      if (onLogoutAction != null) {
+        onLogoutAction.run();
+      }
+    });
   }
 }

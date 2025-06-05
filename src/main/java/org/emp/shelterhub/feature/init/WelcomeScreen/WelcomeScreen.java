@@ -23,6 +23,13 @@ public class WelcomeScreen {
   private static Disposable stateSubscription;
 
   public static void show(StackPane root) {
+    // Dispose previous subscription if exists and not disposed
+    if (stateSubscription != null && !stateSubscription.isDisposed()) {
+      stateSubscription.dispose();
+    }
+    // Re-initialize the viewModel for a fresh state
+    viewModel = new WelcomeScreenViewModel();
+
     viewModel.setRoot(root);
     UIComponents ui = new UIComponents();
 

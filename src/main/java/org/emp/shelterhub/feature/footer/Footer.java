@@ -23,18 +23,11 @@ public class Footer extends BorderPane {
   private void setupLayout() {
     setCenter(copyrightLabel);
     setPadding(new Insets(Dimensions.SPACING_SMALL));
-    setMinHeight(30);
+    setMinHeight(25);
   }
 
   private void styleComponents() {
-    setStyle(
-        "-fx-background-color: "
-            + AppTheme.BACKGROUND_COLOR
-            + "; "
-            + "-fx-border-color: "
-            + AppTheme.PRIMARY_COLOR
-            + "; "
-            + "-fx-border-width: 1px;");
+    setStyle("-fx-background-color: #CCCCCC;");
 
     copyrightLabel.setStyle(
         "-fx-text-fill: "

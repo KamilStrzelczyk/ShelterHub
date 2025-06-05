@@ -10,7 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
-import org.emp.shelterhub.lib.infrastructure.utils.UIComponents;
+import org.emp.shelterhub.lib.presentation.UIComponents;
 
 public class WelcomeScreen {
   private static final String WELCOME_MESSAGE = "Witaj w systemie ShelterHub!";

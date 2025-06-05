@@ -16,6 +16,7 @@ public class AboutScreen extends VBox {
 
   private Label userLabel = new Label();
   private Label roleLabel = new Label();
+  private Label versionLabel = new Label();
 
   public AboutScreen() {
     this.setSpacing(Dimensions.SPACING_LARGE);
@@ -42,6 +43,10 @@ public class AboutScreen extends VBox {
     roleLabel.setStyle(
         AppTheme.getLabelStyle(Dimensions.FONT_SIZE_SUBTITLE, true, AppTheme.PRIMARY_COLOR));
 
-    this.getChildren().addAll(titleLabel, descriptionLabel, userLabel, roleLabel);
+    versionLabel.setText("Wersja aplikacji: " + state.getVersion());
+    versionLabel.setStyle(
+        AppTheme.getLabelStyle(Dimensions.FONT_SIZE_SUBTITLE, true, AppTheme.PRIMARY_COLOR));
+
+    this.getChildren().addAll(titleLabel, descriptionLabel, userLabel, roleLabel, versionLabel);
   }
 }

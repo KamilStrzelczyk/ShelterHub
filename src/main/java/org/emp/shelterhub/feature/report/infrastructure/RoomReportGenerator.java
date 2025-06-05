@@ -1,5 +1,6 @@
 package org.emp.shelterhub.feature.report.infrastructure;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -52,13 +53,26 @@ public class RoomReportGenerator {
         sheet.autoSizeColumn(col);
       }
 
-      try (FileOutputStream out = new FileOutputStream("raport_pokoi.xlsx")) {
-        workbook.write(out);
+      String homeDir = System.getProperty("user.home");
+      String reportFileName = "raport_pokoi.xlsx";
+
+      String os = System.getProperty("os.name").toLowerCase();
+      String savePath;
+      if (os.contains("mac")) {
+        savePath = homeDir + File.separator + "Downloads" + File.separator + reportFileName;
+      } else {
+        savePath = homeDir + File.separator + reportFileName;
       }
 
-      System.out.println("Raport wygenerowany: raport_pokoi.xlsx");
+      File reportFile = new File(savePath);
+
+      try (FileOutputStream out = new FileOutputStream(reportFile)) {
+        workbook.write(out);
+      }
+      System.out.println("Raport wygenerowany: " + reportFile.getAbsolutePath());
 
     } catch (IOException e) {
+      System.err.println("Błąd podczas generowania raportu: " + e.getMessage());
       e.printStackTrace();
     }
   }

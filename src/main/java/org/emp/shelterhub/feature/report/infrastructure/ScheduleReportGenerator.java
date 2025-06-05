@@ -1,5 +1,6 @@
 package org.emp.shelterhub.feature.report.infrastructure;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -45,13 +46,27 @@ public class ScheduleReportGenerator {
         sheet.autoSizeColumn(col);
       }
 
-      try (FileOutputStream out = new FileOutputStream("grafik_pracownikow.xlsx")) {
+      String homeDir = System.getProperty("user.home");
+      String reportFileName = "grafik_pracownikow.xlsx";
+
+      String os = System.getProperty("os.name").toLowerCase();
+      String savePath;
+      if (os.contains("mac")) {
+        savePath = homeDir + File.separator + "Downloads" + File.separator + reportFileName;
+      } else {
+        savePath = homeDir + File.separator + reportFileName;
+      }
+
+      File reportFile = new File(savePath);
+
+      try (FileOutputStream out = new FileOutputStream(reportFile)) {
         workbook.write(out);
       }
 
-      System.out.println("Raport grafiku wygenerowany: grafik_pracownikow.xlsx");
+      System.out.println("Raport grafiku wygenerowany: " + reportFile.getAbsolutePath());
 
     } catch (IOException e) {
+      System.err.println("Błąd podczas generowania raportu grafiku: " + e.getMessage());
       e.printStackTrace();
     }
   }

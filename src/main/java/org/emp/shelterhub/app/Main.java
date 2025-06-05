@@ -30,7 +30,8 @@ public class Main extends Application {
     primaryStage.setMaximized(true);
     primaryStage.show();
 
-    WelcomeScreen.show(root);
+    WelcomeScreen welcomeScreen = new WelcomeScreen();
+    welcomeScreen.show(root);
   }
 
   private Scene createFullScreenScene(StackPane root) {

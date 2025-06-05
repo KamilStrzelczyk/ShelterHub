@@ -1,5 +1,5 @@
-import org.gradle.internal.impldep.org.jsoup.helper.DataUtil.load
-import java.util.Properties
+import org.gradle.internal.os.OperatingSystem
+import java.util.*
 
 plugins {
     id("java")
@@ -8,7 +8,7 @@ plugins {
     id("checkstyle")
     id("com.diffplug.spotless") version "6.25.0"
     id("org.beryx.jlink") version "3.1.1"
-    id ("org.gradlex.extra-java-module-info") version "1.12"
+    id("org.gradlex.extra-java-module-info") version "1.12"
 }
 
 val versionProperties = Properties().apply {
@@ -90,13 +90,33 @@ tasks.test {
 
 jlink {
     options = listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages")
+
     launcher {
         name = "shelterhub"
     }
+
     jpackage {
         imageName = "ShelterHubApp"
         installerName = "ShelterHubInstaller"
-        installerType = "exe"
+
+        if (OperatingSystem.current().isWindows) {
+            installerType = "NONE"
+            icon = "src/main/resources/images/SHELTERHUB.Logo_short.ico"
+            skipInstaller = true
+        } else if (OperatingSystem.current().isMacOsX) {
+            installerType = "dmg"
+            skipInstaller = true
+            icon = "src/main/resources/images/SHELTERHUB.icns"
+            installerOptions = listOf(
+                "--mac-bundle-identifier", "com.emp.shelterhub",
+                "--mac-package-name", "ShelterHub"
+            )
+        } else if (OperatingSystem.current().isLinux) {
+            skipInstaller = true
+            installerType = "deb"
+            icon = "src/main/resources/images/SHELTERHUB.Logo_short.png"
+        }
     }
+
     forceMerge("javafx.*", "org.xerial.sqlite-jdbc")
 }

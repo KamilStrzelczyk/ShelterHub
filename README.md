@@ -24,5 +24,5 @@ This approach results in a lightweight, self-contained executable package optimi
 To build a clean project and generate the custom runtime image, run:
 
 ```bash
-./gradlew clean jlink
+./gradlew clean jpackage
 ```

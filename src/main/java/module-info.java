@@ -1,18 +1,17 @@
-module org.emp.shelterhub {
+module ShelterHub.main {
+  requires io.reactivex.rxjava3;
+  requires java.desktop;
+  requires java.sql;
+  requires javafx.base;
   requires javafx.controls;
-  requires javafx.fxml;
+  requires javafx.graphics;
+  requires org.apache.poi.ooxml;
+  requires org.apache.poi.poi;
+  requires org.apache.commons.lang3;
+  requires commons.math3;
 
-  opens org.emp.shelterhub.app to
-      javafx.fxml;
+  exports org.emp.shelterhub.app to
+      javafx.graphics;
 
-  exports org.emp.shelterhub.app;
-  exports org.emp.shelterhub.lib.infrastructure.utils;
-
-  opens org.emp.shelterhub.lib.infrastructure.utils to
-      javafx.fxml;
-
-  exports org.emp.shelterhub.feature.init;
-
-  opens org.emp.shelterhub.feature.init to
-      javafx.fxml;
+  requires org.xerial.sqlitejdbc;
 }

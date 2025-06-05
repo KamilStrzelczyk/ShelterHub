@@ -1,3 +1,6 @@
+import org.gradle.internal.impldep.org.jsoup.helper.DataUtil.load
+import java.util.Properties
+
 plugins {
     id("java")
     id("application")
@@ -8,8 +11,12 @@ plugins {
     id ("org.gradlex.extra-java-module-info") version "1.12"
 }
 
+val versionProperties = Properties().apply {
+    load(file("version.properties").inputStream())
+}
+
 group = "org.emp.shelterhub"
-version = "0.1.0"
+version = versionProperties.getProperty("app.version")
 
 application {
     mainClass.set("org.emp.shelterhub.app.Main")

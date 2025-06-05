@@ -13,6 +13,7 @@ import org.emp.shelterhub.feature.room.data.Room;
 import org.emp.shelterhub.feature.room.data.RoomState;
 import org.emp.shelterhub.feature.room.data.RoomType;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+import org.emp.shelterhub.lib.presentation.AppIcon;
 
 public class RoomEditDialog extends Stage {
 
@@ -26,6 +27,7 @@ public class RoomEditDialog extends Stage {
 
   public RoomEditDialog(Room room) {
     this.room = room;
+    this.getIcons().add(AppIcon.getAppIcon());
 
     initModality(Modality.APPLICATION_MODAL);
     setTitle(room == null ? "Dodaj Nowy Pokój" : "Edytuj Pokój " + room.getRoomNumber());

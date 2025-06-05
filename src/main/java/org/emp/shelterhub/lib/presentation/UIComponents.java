@@ -1,4 +1,4 @@
-package org.emp.shelterhub.lib.infrastructure.utils;
+package org.emp.shelterhub.lib.presentation;
 
 import java.util.Objects;
 import javafx.geometry.Insets;
@@ -10,6 +10,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
+import org.emp.shelterhub.lib.infrastructure.utils.Res;
 
 public class UIComponents {
 

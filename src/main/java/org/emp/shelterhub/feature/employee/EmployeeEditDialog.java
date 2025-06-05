@@ -16,6 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.emp.shelterhub.feature.employee.data.Employee;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+import org.emp.shelterhub.lib.presentation.AppIcon;
 
 public class EmployeeEditDialog extends Stage {
 
@@ -36,6 +37,7 @@ public class EmployeeEditDialog extends Stage {
   public EmployeeEditDialog(EmployeeScreenViewModel viewModel, Employee employee) {
     this.viewModel = viewModel;
     this.employee = employee;
+    this.getIcons().add(AppIcon.getAppIcon());
 
     initModality(Modality.APPLICATION_MODAL);
     setTitle(

@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import org.emp.shelterhub.feature.employee.data.Employee;
 import org.emp.shelterhub.feature.scheduler.data.ScheduleEntry;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
+import org.emp.shelterhub.lib.presentation.AppIcon;
 
 public class ScheduleEditDialog extends Stage {
 
@@ -33,6 +34,7 @@ public class ScheduleEditDialog extends Stage {
 
   public ScheduleEditDialog(ScheduleEntry entry, List<Employee> employees) {
     this.scheduleEntry = entry;
+    this.getIcons().add(AppIcon.getAppIcon());
 
     initModality(Modality.APPLICATION_MODAL);
     setTitle(entry == null ? "Dodaj Zadanie" : "Edytuj Zadanie");

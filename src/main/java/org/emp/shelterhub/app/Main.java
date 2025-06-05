@@ -1,5 +1,6 @@
 package org.emp.shelterhub.app;
 
+import java.awt.*;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -9,6 +10,7 @@ import javafx.stage.Stage;
 import org.emp.shelterhub.feature.init.SplashScreen;
 import org.emp.shelterhub.feature.init.WelcomeScreen.WelcomeScreen;
 import org.emp.shelterhub.lib.db.database.SHDataBase;
+import org.emp.shelterhub.lib.presentation.AppIcon;
 
 public class Main extends Application {
   private static final String MAIN_TITLE = "ShelterHub";
@@ -22,6 +24,8 @@ public class Main extends Application {
 
   private void mainContainer(Stage primaryStage) {
     primaryStage.setTitle(MAIN_TITLE);
+
+    primaryStage.getIcons().add(AppIcon.getAppIcon());
 
     StackPane root = new StackPane();
     Scene scene = createFullScreenScene(root);

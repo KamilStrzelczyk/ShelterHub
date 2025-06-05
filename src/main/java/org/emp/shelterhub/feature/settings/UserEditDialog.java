@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import org.emp.shelterhub.feature.settings.data.User;
 import org.emp.shelterhub.lib.infrastructure.utils.AppTheme;
 import org.emp.shelterhub.lib.infrastructure.utils.Dimensions;
+import org.emp.shelterhub.lib.presentation.AppIcon;
 
 public class UserEditDialog extends Stage {
 
@@ -27,6 +28,8 @@ public class UserEditDialog extends Stage {
 
   public UserEditDialog(User user) {
     this.user = user;
+    this.getIcons().add(AppIcon.getAppIcon());
+
     initModality(Modality.APPLICATION_MODAL);
     setTitle("Edytuj Dane Użytkownika");
 
